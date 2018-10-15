@@ -17,9 +17,6 @@ src/main/antlr4/cmm/compiler/.antlr
 #   Eclipse
 .settings/
 
-# Used external libraries
-lib/
-
 # Generated Jasmin files
 *.j
 
