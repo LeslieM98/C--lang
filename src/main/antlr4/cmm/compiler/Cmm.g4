@@ -1,155 +1,163 @@
-Grammar C--;
+grammar Cmm;
 
-assign
+ASSIGN
 	: '='
 	;
 
-semicolon
+SEMICOLON
 	: ';'
 	;
 
-identifier
-	: (name_start_char)(name_char)*
-	;
-
-name_start_char
+NAME_START_CHAR
 	: ('a'..'z') | 'ä' | 'ö' | 'ü'
 	| ('A'..'Z') | 'Ä' | 'Ö' | 'Ü'
 	| '_'
 	;
 
-name_char
-	: name_start_char
+NAME_CHAR
+	: NAME_START_CHAR
 	| ('0'..'9')
 	;
 
-const_keyword
+identifier
+	: (NAME_START_CHAR)(NAME_CHAR)*
+	;
+
+CONST_KEYWORD
 	: 'const'
 	;
 
-type
+IF_KEYWORD
+	: 'if'
+	;
+
+TYPE
 	: 'int'
 	| 'float'
 	| 'char'
 	;
 
-type_void:
+TYPE_VOID
 	: 'void'
 	;
 
-separator
+SEPARATOR
 	: ','
 	;
 
-parameter_begin:
+PARAMETER_BEGIN
 	: '('
 	;
 
-parameter_end:
+PARAMETER_END
 	: ')'
 	;
 
-block_begin:
+BLOCK_BEGIN
 	: '{'
 	;
 
-block_end:
+BLOCK_END
 	: '}'
 	;
 
+RETURN_KEYWORD
+	: 'return'
+	;
+
 /* VARIABLES*/
-CONSTANT_VARIABLE_DEFINITION
-	: const_keyword GENERIC_VARIABLE_DECLARATION assign EXPRESSION
+generic_variable_declaration
+	: TYPE identifier
 	;
 
-VARIABLE_INITIALIZATION
-	: GENERIC_VARIABLE_DECLARATION assign EXPRESSION
+constant_variable_definition
+	: CONST_KEYWORD generic_variable_declaration ASSIGN expression
 	;
 
-GENERIC_VARIABLE_DECLARATION
-	: type identifier
+variable_initialization
+	: generic_variable_declaration ASSIGN expression
 	;
 
-VARIABLE_DECLARATION
-	: GENERIC_VARIABLE_DECLARATION semicolon
-	| CONSTANT_VARIABLE_DEFINITION semicolon
+variable_declaration
+	: generic_variable_declaration SEMICOLON
+	| constant_variable_definition SEMICOLON
 	;
 
 
 /* FUNCTIONS */
-PARAMETER
-	: GENERIC_VARIABLE_DECLARATION
+parameter
+	: generic_variable_declaration
 	;
 
-PARAMETER_LIST
-	: PARAMETER
-	| PARAMETER separator PARAMETER_LIST
+parameter_list
+	: parameter
+	| parameter SEPARATOR parameter_list
 	;
 
-PARAMETER_BLOCK
-	: parameter_begin parameter_end
-	| parameter_begin PARAMETER_LIST parameter_end
+parameter_block
+	: PARAMETER_BEGIN PARAMETER_END
+	| PARAMETER_BEGIN parameter_list PARAMETER_END
 	;
 
-FUNCTION_DEFINITION
-	: type identifier PARAMETER_BLOCK BLOCK
-	| type_void identifier PARAMETER_BLOCK BLOCK
+function_definition
+	: TYPE identifier parameter_block block
+	| TYPE_VOID identifier parameter_block block
 	;
 
 // BEGIN TODO
-FUNCTION_CALL
+function_call
 	:
 	;
 // END TODO
 
 /* BLOCKS */
-BLOCK
-	: block_begin STATEMENT_LIST block_end
+block
+	: BLOCK_BEGIN statement_list BLOCK_END
 	;
 
 /* IF */
-IF
-	: if_keyword parameter_begin CONDITION parameter_end BLOCK
+if
+	: IF_KEYWORD PARAMETER_BEGIN condition PARAMETER_END block
 	;
 
 // BEGIN TODO
-CONDITION
+condition
 	:
 	;
 // END TODO
 
 /* STATEMENTS */
-STATEMENT_LIST
-	: STATEMENT
-	| STATEMENT_LIST STATEMENT
+statement_list
+	: statement
+	| statement statement_list 
 	;
 
-STATEMENT
-	: VARIABLE_DECLARATION
-	| FUNCTION_CALL semicolon
-	| ASSIGN_OPERATION semicolon
-	| IF
-	| LOOP
-	| RETURN semicolon
+statement
+	: variable_declaration
+	| function_call SEMICOLON
+	| assign_operation SEMICOLON
+	| if
+	| loop
+	| RETURN_KEYWORD SEMICOLON
 	;
 
-/* GLOBALS */
-GLOB_STMNT
-	: VARIABLE_DECLARATION
-	| FUNCTION_DEFINITION
+/* PROGRAM */
+program_statement
+	: variable_declaration
+	| function_definition
 // BEGIN TODO
-	| STRUCT_DEF
-	| ARR_DEC
+	| struct_def
+	| array_declaration
 // END TODO
 	; 
 
-PROGRAM_LIST
+program_list
 // BEGIN TODO
-	: PROGRAM_STATEMENT
-	| PROGRAM_LIST PROGRAM_STATEMENT
+	: program_statement
+	| program_list program_statement
 // END TODO
 	;
 
-PROGRAM
-	: PROGRAM_LIST
+program
+	: program_list
 	;
