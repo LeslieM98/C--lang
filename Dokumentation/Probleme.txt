@@ -1,0 +1,5 @@
+Problem: Expression Definition
+	- Was ist alles eine Expression
+	- Wie unterscheiden wir Boolsche Expressions
+--> 	- Eine Expression ist alles das was einen Wert liefert
+	- Man unterscheidet sie nicht 
