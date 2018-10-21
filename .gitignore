@@ -24,4 +24,7 @@ src/main/antlr4/cmm/compiler/.antlr
 *.class
 
 # TestMain
-src/main/java/cmm/compiler/AppTest.java
+src/main/java/cmm/compiler/TestApp.java
+
+# Testfile for sourcecode
+test.txt
