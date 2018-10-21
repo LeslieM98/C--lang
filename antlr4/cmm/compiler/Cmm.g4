@@ -107,6 +107,7 @@ expression
     | left=expression '&&' right=expression #And
     | left=expression '||' right=expression #Or
     | '!' expr=expression #Not
+    | '(' expr=expression ')'
     | number=NUMBER #Number
     | character=CHARACTER #Character
     | variableName=IDENTIFIER #Variable
