@@ -8,6 +8,13 @@ package cmm.compiler;
 public class App{
 
     /**
+     * Ctor
+     */
+    public App(){
+
+    }
+
+    /**
      * Program entry.
      * @param args Command line 
     */
