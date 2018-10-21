@@ -1,0 +1,1 @@
+Als Konzept für die Sprache haben wir uns überlegt eine C-ähnliche Sprache zu definieren mit weniger Features.
