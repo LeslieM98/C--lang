@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.Token;
 /**
  * A class that sets the base for any Compile Error rised by compiling a 
  * C-- source document. Every Compile Error has to extend this class.
+ * This Exception is unchecked and does not need to be catched.
  * and potentially overwrite {@link #getPrefix()} and
  * 
  * @author Leslie Marxen
