@@ -73,8 +73,8 @@ statementList
 
 variable_declaration
     : generic_variable_declaration #vardec
-    | generic_variable_declaration ASSIGN expr=expression #vardecassign
-    | 'const' generic_variable_declaration ASSIGN expr=expression #constdec
+    | generic_variable_declaration ASSIGN val=expression #vardecassign
+    | 'const' dec=generic_variable_declaration ASSIGN val=expression #constdec
     ;
 
 function_call
