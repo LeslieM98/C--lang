@@ -1,15 +1,14 @@
 package cmm.compiler;
 
-import cmm.parser.CmmBaseVisitor;
-
 import java.util.ArrayList;
 import java.util.List;
 
-class CmmVisitor extends CmmBaseVisitor<List<String>>{
+class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
 
-    public CmmVisitor(){
+    public ProgramVisitor(){
         super();
+        System.out.println("Test!");
     }
 
     @Override

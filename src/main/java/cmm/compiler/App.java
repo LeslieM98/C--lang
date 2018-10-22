@@ -29,6 +29,7 @@ public class App{
      */
     public void start(String[] args){
         System.out.println("Hello World!");
+        ProgramVisitor pv = new ProgramVisitor();
     }
 
 }

@@ -72,9 +72,9 @@ statementList
     : statement*;
 
 variable_declaration
-    : generic_variable_declaration 
-    | generic_variable_declaration ASSIGN expr=expression 
-    | 'const' generic_variable_declaration ASSIGN expr=expression 
+    : generic_variable_declaration #vardec
+    | generic_variable_declaration ASSIGN expr=expression #vardecassign
+    | 'const' generic_variable_declaration ASSIGN expr=expression #constdec
     ;
 
 function_call
@@ -107,7 +107,7 @@ expression
     | left=expression '&&' right=expression #And
     | left=expression '||' right=expression #Or
     | '!' expr=expression #Not
-    | '(' expr=expression ')'
+    | '(' expr=expression ')' #Parenthesis
     | number=NUMBER #Number
     | character=CHARACTER #Character
     | variableName=IDENTIFIER #Variable
