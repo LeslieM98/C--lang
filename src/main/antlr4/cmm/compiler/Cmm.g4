@@ -1,6 +1,11 @@
 grammar Cmm;
 
 /* LEXER */
+
+WHITESPACE
+    : [ \n\t\r]+ -> skip
+    ;
+
 SEMICOLON
     : ';'
     ;
@@ -21,9 +26,6 @@ CHARACTER
     ;
 ASSIGN
     : '='
-    ;
-WHITESPACE
-    : [ \n\t\r]+ -> skip
     ;
 
 /* PARSER */

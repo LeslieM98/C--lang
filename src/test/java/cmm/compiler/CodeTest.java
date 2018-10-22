@@ -13,8 +13,11 @@ import java.lang.reflect.*;
 import java.io.PrintStream;
 import java.net.*;
 
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
 import org.junit.jupiter.api.*;
 
+import cmm.compiler.exception.AllreadyDefinedException;
 import jas.jasError;
 import jasmin.ClassFile;
 
@@ -42,7 +45,7 @@ public class CodeTest{
     }
 
     /**
-     * Returns the produced output of the given classfile
+     * Returns the produced output of the given classfile.
      * @param cf The Class that will be run.
      * @return The output given by the code. or null if the code was not able to run.
      */
@@ -92,10 +95,41 @@ public class CodeTest{
      * @param source C-- source code
      * @return Everything printed to System.out while the code was running.
      */
+    // TODO: implement
     public String runCmm(String source){
 
 
         return null;
+    }
+
+
+    /**
+     * Takes in a String of C-- source code and returns a corresponding Parser.
+     * @param input The C--. input sourcecode to parse.
+     * @return A functioning parser.
+     */
+    public CmmParser createParser(String input){
+        CmmLexer tmpLex = new CmmLexer(CharStreams.fromString(input));
+        CommonTokenStream tmpTkStream = new CommonTokenStream(tmpLex);
+        CmmParser tmpParser = new CmmParser(tmpTkStream);
+        return tmpParser;
+    }
+
+    /**
+     * Takes in a Path to a File containing C-- source code and returns a corresponding Parser.
+     * @param input Path to a file containing C-- source code.
+     * @return A functioning parser.
+     */
+    public CmmParser createParser(Path input){
+        CmmLexer tmpLex;
+        try{
+            tmpLex = new CmmLexer(CharStreams.fromPath(input));
+        } catch (Exception e){
+            return null;
+        }
+        CommonTokenStream tmpTkStream = new CommonTokenStream(tmpLex);
+        CmmParser tmpParser = new CmmParser(tmpTkStream);
+        return tmpParser;
     }
 
 
@@ -118,4 +152,28 @@ public class CodeTest{
 
         Assertions.assertEquals(output, "Hello world!" + System.lineSeparator());
     }
+
+    @Test
+    public void testConstants(){
+        String inputString = "const num test = 20;";
+        ParseTree tree = createParser(inputString).program();
+        ProgramVisitor v = new ProgramVisitor();
+        try{
+            v.visit(tree);
+        } catch (Exception e){
+            Assertions.fail("Exception was thrown" + e.getMessage());
+        }
+
+        boolean exThrown = false;
+        inputString = "const num test = 20; const num test = 21;";
+        tree = createParser(inputString).program();
+        v = new ProgramVisitor();
+        try{
+            v.visit(tree);
+        } catch (Exception e){
+            exThrown = true;
+        }
+        Assertions.assertTrue(exThrown);
+
+    }   
 }

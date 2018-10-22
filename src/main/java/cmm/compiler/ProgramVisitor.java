@@ -1,19 +1,30 @@
 package cmm.compiler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import org.antlr.v4.runtime.Token;
+
+import cmm.compiler.CmmParser.ConstdecContext;
+
+import cmm.compiler.exception.*;
 
 class ProgramVisitor extends CmmBaseVisitor<List<String>>{
+
+    private HashMap<String, String> constTable;
 
 
     public ProgramVisitor(){
         super();
-        System.out.println("Test!");
+        constTable = new HashMap<>();
     }
 
     @Override
     protected List<String> defaultResult() {
         return new ArrayList<>();
+    }
+
+    String getConstant(String constName){
+        return constTable.get(constName);
     }
 
     @Override
@@ -36,6 +47,21 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         tmp.addAll(nextResult);
 
         return tmp;
+    }
+
+    // Context subroutines
+
+    @Override
+    public List<String> visitConstdec(ConstdecContext ctx) {
+        Token tk = ctx.dec.variableName;
+        String name = ctx.dec.variableName.getText();
+        String value = ctx.val.getText();
+
+        if(constTable.putIfAbsent(name, value) != null){
+            throw new AllreadyDefinedException(tk, "Redefinition of constant");
+        }
+
+        return null;
     }
 
 }
