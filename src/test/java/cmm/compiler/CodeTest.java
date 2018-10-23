@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.ArrayList;
 import java.lang.reflect.*;
 import java.io.PrintStream;
@@ -95,11 +96,15 @@ public class CodeTest{
      * @param source C-- source code
      * @return Everything printed to System.out while the code was running.
      */
-    // TODO: implement
     public String runCmm(String source){
+        ParseTree tree = createParser(source).program();
+        ProgramVisitor v = new ProgramVisitor();
+        
+        String asm = String.join(System.lineSeparator(), v.visit(tree));   
 
+        String output = runJasmin(source);
 
-        return null;
+        return output;
     }
 
 
