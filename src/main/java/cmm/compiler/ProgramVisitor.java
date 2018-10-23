@@ -4,18 +4,28 @@ import java.util.*;
 
 import org.antlr.v4.runtime.Token;
 
-import cmm.compiler.CmmParser.ConstdecContext;
-
+import cmm.compiler.CmmParser.*;
 import cmm.compiler.exception.*;
+import cmm.compiler.utillity.*;
 
 class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
-    private HashMap<String, String> constTable;
+    // constant identifiers
+    private Map<String, String> constTable;
+
+    // Scopes
+    private Map<String, HashMap<String, String>> scopesTable;   // Scopename  -> ScopeTable
+    private final Map<String, String> globalScope;              // Identifier -> field id
+    private Map<String, String> currentScope;                   // Identifier -> local id
+
+    // functionIdentifiers
+    private Set<Function> definedFunctions;
 
 
     public ProgramVisitor(){
         super();
         constTable = new HashMap<>();
+        globalScope = new HashMap<>();
     }
 
     @Override
@@ -62,6 +72,19 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         }
 
         return null;
+    }
+
+    @Override
+    public List<String> visitFunction_definition(Function_definitionContext ctx) {
+        List<String> asm = new ArrayList<>();
+
+        String funcID = ctx.function_header().functionName.getText();
+        // String retType = ctx.function_header().retType.getText();
+        List<String> params = new ArrayList<>();
+        // int paramCount = ctx.function_header().dec
+        
+
+        return asm;
     }
 
 }

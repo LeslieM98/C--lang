@@ -3,3 +3,16 @@ Problem: Expression Definition
 	- Wie unterscheiden wir Boolsche Expressions
 --> 	- Eine Expression ist alles das was einen Wert liefert
 	- Man unterscheidet sie nicht 
+
+
+Problem: Fehler erkennung
+	- Exception System aufbauen das Exceptions wirft wenn fehler auftritt
+	Problem: nur ein Fehler pro compile durchgang.
+
+Problem: Scopes richtig darstellen
+	- Scopetable einführen Scopename -> Identifier
+	  Wenn enthalten, Identifier ist im momentanen scope, 
+	  sonst nicht.
+
+Problem: Representation von Funktionen
+	- Datenklasse erstellen die nur wichtigste metadaten zu einer funktion enthält

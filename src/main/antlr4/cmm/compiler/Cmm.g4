@@ -43,16 +43,22 @@ function_definition
     ;
 
 function_header
-    : TYPE functionName=IDENTIFIER '(' parameters=parameter_list ')' 
+    : ret_type functionName=IDENTIFIER '(' parameters=parameter_list ')' 
 	;
+
+ret_type
+    : TYPE
+    | 'void'
+    ;
 
 generic_variable_declaration
     : TYPE variableName=IDENTIFIER
     ;
 parameter_list
-    : declarations+=generic_variable_declaration (',' declarations+=generic_variable_declaration)*
-    |
+    : (generic_variable_declaration (',' generic_variable_declaration)*)
     ;
+
+
 
 function_body
     : '{' statements=statementList 'return' returnValue=expression SEMICOLON '}'
