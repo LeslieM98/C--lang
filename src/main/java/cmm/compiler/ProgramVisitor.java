@@ -97,7 +97,7 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.addAll(visit(ctx.function_body()));
 
         if(toNativeTypes(param) != NativeTypes.VOID){
-            System.out.println( ctx.function_body().getText());
+
         }
         return asm;
     }
