@@ -19,6 +19,7 @@ public class Function{
     public Function(String identifier){
         setIdentifier(identifier);
         parameterList = new ArrayList<>();
+        returnType = NativeTypes.VOID;
     }
 
     public Function(NativeTypes returnType, String identifier, Pair<String, NativeTypes>... parameterList){

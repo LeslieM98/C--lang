@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.*;
 
 import cmm.compiler.CmmParser.*;
 import cmm.compiler.exception.*;
@@ -88,17 +89,26 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
     @Override
-
     public List<String> visitFunction_definition(Function_definitionContext ctx) {
-        
-        List<String> asm = visit(ctx.function_header());
-        String param = ctx.function_header().getChild(ctx.function_header().getChildCount() - 2).getText();
+        List<String> asm = new ArrayList<>();
 
-        asm.addAll(visit(ctx.function_body()));
+        // Determine returntype and name
+        String name = ctx.function_header().functionName.getText();
+        NativeTypes retType = toNativeTypes(ctx.function_header().ret.getText());
 
-        if(toNativeTypes(param) != NativeTypes.VOID){
+        // Determine parameters
+        List<Pair<String, NativeTypes>>params = new ArrayList<>();
+        int paramcount = ctx.function_header()
+            .getChild(ctx.function_header().getChildCount()-2)
+            .getChildCount();
+        paramcount -= paramcount/2;
 
-        }
+        // Add params to function object
+
+        System.out.println(paramcount);
+
+
+
         return asm;
     }
 
