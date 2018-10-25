@@ -1,5 +1,7 @@
 package cmm.compiler;
 
+import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.*;
 
 import org.antlr.v4.runtime.Token;
@@ -26,6 +28,17 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         super();
         constTable = new HashMap<>();
         globalScope = new HashMap<>();
+    }
+
+    private NativeTypes toNativeTypes(String in){
+        if(in.equals("void")){
+            return NativeTypes.VOID;
+        } else if(in.equals("num")){
+            return NativeTypes.NUM;
+        } else if(in.equals("char")){
+            return NativeTypes.CHARACTER;
+        }
+        return null;
     }
 
     @Override
@@ -75,15 +88,17 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
     @Override
+
     public List<String> visitFunction_definition(Function_definitionContext ctx) {
-        List<String> asm = new ArrayList<>();
-
-        String funcID = ctx.function_header().functionName.getText();
-        // String retType = ctx.function_header().retType.getText();
-        List<String> params = new ArrayList<>();
-        // int paramCount = ctx.function_header().dec
         
+        List<String> asm = visit(ctx.function_header());
+        String param = ctx.function_header().getChild(ctx.function_header().getChildCount() - 2).getText();
 
+        asm.addAll(visit(ctx.function_body()));
+
+        if(toNativeTypes(param) != NativeTypes.VOID){
+            System.out.println( ctx.function_body().getText());
+        }
         return asm;
     }
 

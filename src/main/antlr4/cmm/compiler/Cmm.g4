@@ -11,7 +11,6 @@ SEMICOLON
     ;
 TYPE
     : 'num'
-    | 'char'
     ;
 IDENTIFIER
     : [a-zA-Z_][a-zA-Z0-9_]*
@@ -43,7 +42,7 @@ function_definition
     ;
 
 function_header
-    : ret_type functionName=IDENTIFIER '(' parameters=parameter_list ')' 
+    : ret=ret_type functionName=IDENTIFIER '(' (parameter_list | 'void') ')'
 	;
 
 ret_type

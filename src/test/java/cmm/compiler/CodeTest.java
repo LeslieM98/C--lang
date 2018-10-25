@@ -32,7 +32,7 @@ public class CodeTest{
      * @param source Jasmin source code
      * @return Everything printed to System.out while the code was running.
      */
-    private String runJasmin(String source){
+    private static String runJasmin(String source){
         ClassFile exec = new ClassFile();
         try{
             exec.readJasmin(new StringReader(source), "TestAsm", true); // Compiler Jasmin
@@ -46,11 +46,27 @@ public class CodeTest{
     }
 
     /**
+     * Takes in jasmin assembly, assembles it, runs it and 
+     * returns the output of System.out of the given code.
+     * @param source Jasmin source code
+     * @return Everything printed to System.out while the code was running.
+     */
+    private static String runJasmin(Path source){
+        List<String> asm;
+        try{
+            asm = Files.readAllLines(source);
+        } catch (IOException e){
+            asm = new ArrayList<>();
+        }
+        return runJasmin(String.join("", asm));
+    }
+
+    /**
      * Returns the produced output of the given classfile.
      * @param cf The Class that will be run.
      * @return The output given by the code. or null if the code was not able to run.
      */
-    private String runClassFile(ClassFile cf){
+    private static String runClassFile(ClassFile cf){
 
         // Redirect stdout
         PrintStream sysout = System.out;
@@ -96,7 +112,24 @@ public class CodeTest{
      * @param source C-- source code
      * @return Everything printed to System.out while the code was running.
      */
-    public String runCmm(String source){
+    public static String runCmm(String source){
+        ParseTree tree = createParser(source).program();
+        ProgramVisitor v = new ProgramVisitor();
+        
+        String asm = String.join(System.lineSeparator(), v.visit(tree));   
+
+        String output = runJasmin(source);
+
+        return output;
+    }
+
+    /**
+     * Takes in C-- sourcecode, compiles it to jasmin, assembles it, 
+     * runs it and returns the output of System.out of the given code.
+     * @param source C-- source code
+     * @return Everything printed to System.out while the code was running.
+     */
+    public static String runCmm(Path source){
         ParseTree tree = createParser(source).program();
         ProgramVisitor v = new ProgramVisitor();
         
@@ -113,7 +146,7 @@ public class CodeTest{
      * @param input The C--. input sourcecode to parse.
      * @return A functioning parser.
      */
-    public CmmParser createParser(String input){
+    public static CmmParser createParser(String input){
         CmmLexer tmpLex = new CmmLexer(CharStreams.fromString(input));
         CommonTokenStream tmpTkStream = new CommonTokenStream(tmpLex);
         CmmParser tmpParser = new CmmParser(tmpTkStream);
@@ -125,7 +158,7 @@ public class CodeTest{
      * @param input Path to a file containing C-- source code.
      * @return A functioning parser.
      */
-    public CmmParser createParser(Path input){
+    public static CmmParser createParser(Path input){
         CmmLexer tmpLex;
         try{
             tmpLex = new CmmLexer(CharStreams.fromPath(input));
@@ -193,5 +226,11 @@ public class CodeTest{
             Assertions.fail("Exception was thrown" + e.getMessage());
         }
 
-    }   
+    }
+
+    public static void main(String[] args) {
+        ParseTree tree = createParser(Paths.get("test.txt")).program();
+        ProgramVisitor v = new ProgramVisitor();
+        v.visit(tree);
+    }
 }
