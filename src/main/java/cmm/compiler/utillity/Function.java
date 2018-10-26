@@ -1,9 +1,7 @@
 package cmm.compiler.utillity;
 
-import java.lang.annotation.Native;
 import java.util.ArrayList;
 import java.util.List;
-import org.antlr.v4.runtime.misc.*;
 
 public class Function{
     private String identifier;
@@ -78,7 +76,7 @@ public class Function{
             }
 
             for(int i = 0; i < parameterList.size(); i++){
-                b &= parameterList.get(i).b == o.parameterList.get(i).b;
+                b &= parameterList.get(i).getRight() == o.parameterList.get(i).getRight();
             }
             
             return b;

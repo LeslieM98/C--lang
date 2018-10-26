@@ -2,8 +2,6 @@ package cmm.compiler.utillity;
 
 import java.util.*;
 
-import org.antlr.v4.runtime.misc.Pair;
-
 /**
  * This class exists for the purpose of managing variable/constants 
  * access in different scopes within a sourcecode file.<br>
