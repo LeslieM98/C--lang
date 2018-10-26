@@ -89,6 +89,7 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return null;
     }
 
+    // TODO: Check for correct return
     @Override
     public List<String> visitFunction_definition(Function_definitionContext ctx) {
         List<String> asm = new ArrayList<>();
@@ -149,7 +150,9 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         asm.add(methodHead.toString());
 
-        
+        asm.addAll(visit(ctx.function_body()));
+
+        asm.add(".end method");
 
         return asm;
     }

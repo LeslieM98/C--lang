@@ -13,6 +13,10 @@ Problem: Scopes richtig darstellen
 	- Scopetable einführen Scopename -> Identifier
 	  Wenn enthalten, Identifier ist im momentanen scope, 
 	  sonst nicht.
+-->		- Eine Scopemanagement Klasse schreiben die herausfindet ob eine gecallte var gültig ist oder nicht
+		  Untestützt lokale, globale und temporäre Scopes
+	- Was sind temporäre scopes?
+--> 	- Beispielsweise Scopes die nur innerhalb ifs und schleifen existieren.
 
 Problem: Representation von Funktionen
 	- Datenklasse erstellen die nur wichtigste metadaten zu einer funktion enthält
