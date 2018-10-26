@@ -4,6 +4,25 @@ import java.util.*;
 
 import org.antlr.v4.runtime.misc.Pair;
 
+/**
+ * This class exists for the purpose of managing variable/constants 
+ * access in different scopes within a sourcecode file.<br>
+ * {@code Current Scope} meaning all variables/constants a statement 
+ * or expression can access in the current context.<br>
+ * {@code Global Scope} meaning all variables/constants that are 
+ * defined outside of any function.<br>
+ * {@code Local Scope} meaning all variables/constants that are defined 
+ * at a top level scope inside a function.<br>
+ * {@code Temporary Scope} meaning all variables/constans that are 
+ * defined within loop statements, if statements etc.
+ * <br><br>
+ * Temporary Scopes can be nested as deeply as needed but they are 
+ * deleted at the time of leaving the scope. Temporary scopes act as 
+ * a scope stack.
+ * 
+ * @author Leslie Marxen
+ */
+
 
 // TODO: needs testing
 public class ScopeManager {
@@ -21,6 +40,9 @@ public class ScopeManager {
 
 
 
+    /**
+     * Default ctor for a ScopeManager. Only initializes fields.
+     */
     public ScopeManager(){
         globalConstants = new HashMap<>();
         globalVariables = new HashMap<>();
@@ -38,7 +60,7 @@ public class ScopeManager {
     
     /**
      * Checks if given variable/constant is usable in the current Scope.
-     * Returns the {@see Type} of the identifier or null.
+     * Returns the {@link Type} of the identifier or null.
      * @param identifier The name of the variable/constant.
      * @return the type or null if not accessible.
      */
@@ -76,10 +98,11 @@ public class ScopeManager {
     }
 
     /**
-     * Returns a Pair of <{@see Type}, Integer> containing information about the identifier.
+     * Returns a Pair of &lt;{@link Type}, Integer&gt; containing information about the identifier.
      * Checks if the given identifier is accessible from the current scope.
      * Returns null if not accessible.
-     * @param identifier The identifier or either a Var or Const.
+     * This method accounts for Local and Temporary scopes.
+     * @param identifier The identifier of either a Var or Const.
      * @return Information about given identifier, or null if not accessible.
      */
     public Pair<Type, Integer> get(String identifier){
@@ -92,6 +115,14 @@ public class ScopeManager {
         return ret;
     }
 
+    /**
+     * Returns a Pair of &lt;{@link Type}, String&gt; containing information about the identifier.
+     * Checks if the given identifier is accessible from the current Scope
+     * Returns null if not accessible.
+     * This method only accounts for global scopes.
+     * @param identifier The identifier of either a Var or Const.
+     * @return Information about given identifier, or null if not accessible.
+     */
     public Pair<Type, String> getGlobal(String identifier){
 
         String tmp = globalConstants.get(identifier);
@@ -108,6 +139,14 @@ public class ScopeManager {
         return null;
     }
 
+    /**
+     * Returns a Pair of &lt;{@link Type}, Integer&gt; containing information about the identifier.
+     * Checks if the given identifier is accessible from the current Scope
+     * Returns null if not accessible.
+     * This method only accounts for local scopes.
+     * @param identifier The identifier or either a var or const.
+     * @return Information about given identifier or null if not accessible.
+     */
     private Pair<Type, Integer> getLocal(String identifier){
 
         Integer tmp = currentConstants.get(identifier);
@@ -124,6 +163,14 @@ public class ScopeManager {
         return null;
     }
 
+    /**
+     * Returns a Pair of &lt;{@link Type}, Integer&gt; containing information about the identifier.
+     * Checks if the given identifier is accessible from the current Scope
+     * Returns null if not accessible.
+     * This method only accounts for temporary scopes.
+     * @param identifier The identifier or either a var or const.
+     * @return Information about given identifier or null if not accessible.
+     */
     private Pair<Type, Integer> getTemporary(String identifier){
         Integer tmp;
 
@@ -164,6 +211,13 @@ public class ScopeManager {
         return true;
     }
 
+    /**
+     * Creates a new lookuptable for a local scope.
+     * Returns true if succesfully created or false if 
+     * a scope with the same name allready exists.
+     * @param scopeIdentifier A string that identifies the new scope.
+     * @return True if succesfully created, false if otherwise.
+     */
     public boolean createLocalScope(String scopeIdentifier){
         if(localConstantScopes.containsKey(scopeIdentifier) || localVariableScopes.containsKey(scopeIdentifier)){
             return false;
@@ -174,11 +228,17 @@ public class ScopeManager {
         return true;
     }
 
+    /**
+     * Creates a new temporary scope and steps into it.
+     */
     public void enterTempScope(){
         temporaryConstants.add(new HashMap<>());
         temporaryVariables.add(new HashMap<>());
     }
 
+    /**
+     * Leaves the deepest current temporary scope and deletes it.
+     */
     public void leaveTempScope(){
         temporaryConstants.remove(temporaryConstants.size()-1);
         temporaryVariables.remove(temporaryVariables.size()-1);
@@ -202,6 +262,14 @@ public class ScopeManager {
         return true;
     }
 
+    /**
+     * Adds a constant to the local scope.
+     * Inserts a value with the given identifier to the current local scope.
+     * Also checks if the identifier was defined already in the current scope.
+     * @param identifier A string to identifiy the constant.
+     * @param val The value of the set constant.
+     * @return true if sucessfully added, false if otherwise.
+     */
     public boolean addLocalConstant(String identifier, int val){
         if(get(identifier) != null) return false;
 
@@ -209,6 +277,14 @@ public class ScopeManager {
         return true;
     }
 
+    /**
+     * Adds a constant to the local scope.
+     * Inserts a value with the given identifier to the global scope.
+     * Also checks if the identifier was defined already in the current scope.
+     * @param identifier A string to identifiy the constant.
+     * @param val The value of the set constant.
+     * @return true if sucessfully added, false if otherwise.
+     */
     public boolean addGlobalConstant(String identifier, String val){
         if(get(identifier) != null) return false;
 
@@ -218,10 +294,22 @@ public class ScopeManager {
 
 
 
-
+    /**
+     * Adds a variable to the current local scope.
+     * Also finds the next free spot in the locals array.
+     * Returns either a new spot or the old spot if the 
+     * variable allready exists.
+     * This function returns a negative value if it's somehow 
+     * not possible to create a new local variable f.e. another 
+     * variable with the same identifier is allready existing.
+     * @param identifier The name of the variable.
+     * @return The fixed spot in the locals array. Or negative val if no spot is available.
+     */
     public int addLocalVariable(String identifier){
         int r = 0;
+
         if(get(identifier) != null) return -1;
+        if(getGlobal(identifier) != null) return -2;
 
         while(currentVariables.containsValue(r)){
             r++;
@@ -231,11 +319,25 @@ public class ScopeManager {
         return r;
     }
 
+    /**
+     * Adds a variable to the current deepest temporary scope.
+     * Also dynamically finds the next free spot in the locals array.
+     * This returned integer can change depending on how 
+     * other local variables are stored.
+     * The new variable is stored in an 
+     * efficient manner inside the locals array.
+     * This function returns a negative value if another variable
+     * exists with the same name or if it is somehow not possible 
+     * to assign a local spot to the variabls
+     * @param identifier the name of the variable.
+     * @return The dynamic spot in the locals array.
+     */
     public int addTemporaryVariable(String identifier){
         int r = 0;
         boolean b;
 
         if(get(identifier) != null) return -1;
+        if(getGlobal(identifier) != null) return 2;
 
         while(true){
             b = false;
@@ -251,6 +353,13 @@ public class ScopeManager {
         return r;
     }
 
+    /**
+     * Used as reference to what was returned. And how to interpret the result.<br>
+     * {@code VARIABLE} meaning the returned result is to interpret as either an 
+     * identifier in the locals array or a name of the global class attribute.<br>
+     * {@code CONSTANT} meaning the returned result is allready a ready-to-use 
+     * value and has just to be substituted in the expression or statement.
+     */
     public static enum Type{
         VARIABLE,
         CONSTANT;
