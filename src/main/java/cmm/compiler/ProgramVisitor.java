@@ -22,13 +22,14 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     private Map<String, String> currentScope;                   // Identifier -> local id
 
     // functionIdentifiers
-    private Set<Function> definedFunctions;
+    private List<Function> definedFunctions;
 
 
     public ProgramVisitor(){
         super();
         constTable = new HashMap<>();
         globalScope = new HashMap<>();
+        definedFunctions = new ArrayList<>();
     }
 
     private NativeTypes toNativeTypes(String in){
@@ -96,16 +97,29 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String name = ctx.function_header().functionName.getText();
         NativeTypes retType = toNativeTypes(ctx.function_header().ret.getText());
 
+        // Determine parametercount
+        int paramcount = ctx.function_header().getChildCount();
+        paramcount -= 4; // - num, name, (, )
+        paramcount -= paramcount/2; // Extract ',' count
+
         // Determine parameters
-        List<Pair<String, NativeTypes>>params = new ArrayList<>();
-        int paramcount = ctx.function_header()
-            .getChild(ctx.function_header().getChildCount()-2)
-            .getChildCount();
-        paramcount -= paramcount/2;
+        // TODO: check if multiple params have the same name
+        List<Pair<String, NativeTypes>> params = new ArrayList<>();
+        Generic_variable_declarationContext c;
+        for(int i = 0; i/2 < paramcount; i+=2){
+            c = ctx.function_header().getChild(Generic_variable_declarationContext.class, 3 + i);
+            params.add(new Pair<>(
+                c.variableName.getText(),
+                toNativeTypes(c.TYPE().getText())
+            ));
+        }
 
-        // Add params to function object
-
-        System.out.println(paramcount);
+        // Assemble function
+        Function f = new Function(retType, name, params);
+        if(definedFunctions.contains(f)){
+            throw new AllreadyDefinedException(ctx.function_header().functionName, "Function allready defined");
+        }
+        definedFunctions.add(f);
 
 
 

@@ -42,7 +42,7 @@ function_definition
     ;
 
 function_header
-    : ret=ret_type functionName=IDENTIFIER '(' (parameter_list | 'void') ')'
+    : ret=ret_type functionName=IDENTIFIER '(' (generic_variable_declaration (',' generic_variable_declaration)*)? ')'
 	;
 
 ret_type

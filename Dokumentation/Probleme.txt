@@ -16,3 +16,4 @@ Problem: Scopes richtig darstellen
 
 Problem: Representation von Funktionen
 	- Datenklasse erstellen die nur wichtigste metadaten zu einer funktion enthält
+	- Erkennen der anzahl von funktionsparametern schwierig
