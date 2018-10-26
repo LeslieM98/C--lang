@@ -103,11 +103,21 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         paramcount -= paramcount/2; // Extract ',' count
 
         // Determine parameters
-        // TODO: check if multiple params have the same name
         List<Pair<String, NativeTypes>> params = new ArrayList<>();
+        Pair<String, NativeTypes> tmpPair;
         Generic_variable_declarationContext c;
         for(int i = 0; i/2 < paramcount; i+=2){
             c = ctx.function_header().getChild(Generic_variable_declarationContext.class, 3 + i);
+
+            tmpPair = new Pair<>(
+                c.variableName.getText(),
+                toNativeTypes(c.TYPE().getText())
+            );
+
+            if(params.contains(tmpPair)){
+                throw new AllreadyDefinedException(c.variableName, "Param allready defined");
+            }
+
             params.add(new Pair<>(
                 c.variableName.getText(),
                 toNativeTypes(c.TYPE().getText())
@@ -121,9 +131,26 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         }
         definedFunctions.add(f);
 
+        StringBuilder methodHead = new StringBuilder()
+            .append(".method ")
+            .append("public ")
+            .append("static ")
+            .append(name)
+            .append("(")
+            .append((paramcount == 0) ? "V" : "");
 
+        // Append parameters
+        for(int i = 0; i < paramcount; i++){
+            methodHead.append("I");
+        }
+
+        methodHead.append(")")
+            .append(f.getReturnType() == NativeTypes.VOID ? "V" : "I");
+
+        asm.add(methodHead.toString());
+
+        
 
         return asm;
     }
-
 }
