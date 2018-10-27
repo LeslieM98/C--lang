@@ -12,7 +12,14 @@ import org.antlr.v4.runtime.Token;
  */
 
 public abstract class CompileException extends RuntimeException{
+    /**
+     * The token that most likely caused the Exception
+     */
     protected final Token tk;
+
+    /**
+     * A custom message.
+     */
     protected final String msg;
 
     /**
