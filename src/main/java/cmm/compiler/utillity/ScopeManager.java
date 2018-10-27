@@ -48,8 +48,8 @@ public class ScopeManager {
         currentConstants = null;
         currentVariables = null;
 
-        temporaryConstants = new ArrayList<>();
-        temporaryVariables = new ArrayList<>();
+        temporaryConstants = null;
+        temporaryVariables = null;
 
         localVariableScopes = new HashMap<>();
         localConstantScopes = new HashMap<>();
@@ -198,7 +198,7 @@ public class ScopeManager {
         Map<String, Integer> tmpConst = localConstantScopes.get(scopeIdentifier);
         Map<String, Integer> tmpVar   = localVariableScopes.get(scopeIdentifier);
 
-        if(tmpConst == null || tmpConst == null) return false;
+        if(tmpConst == null || tmpVar == null) return false;
 
         currentConstants = tmpConst;
         currentVariables = tmpVar;
@@ -207,6 +207,17 @@ public class ScopeManager {
         temporaryVariables = new ArrayList<>();
         
         return true;
+    }
+
+    /**
+     * Deletes every temporary scope and sets the scope to a global scope.
+     */
+    public void switchToGlobalContext(){
+        currentConstants = null;
+        currentVariables = null;
+
+        temporaryConstants = null;
+        temporaryVariables = null;
     }
 
     /**
@@ -232,6 +243,16 @@ public class ScopeManager {
     public void enterTempScope(){
         temporaryConstants.add(new HashMap<>());
         temporaryVariables.add(new HashMap<>());
+    }
+
+
+    /**
+     * Calculates the depth of temporary scopes.
+     * 0 meaning currently in a local or global scope.
+     * @return Depth of the temporary scopes.
+     */
+    public int currentTempScopeDepth(){
+        return (temporaryConstants == null) ? 0 : temporaryConstants.size();
     }
 
     /**
@@ -349,6 +370,15 @@ public class ScopeManager {
         }
 
         return r;
+    }
+
+    /**
+     * Determines wether the current scope is a local or global scope.
+     * True meaning current scope is in either a local or temporary scope.
+     * @return true if inside of a local scope false if inside a global scope.
+     */
+    public boolean inLocalScope(){
+        return (currentConstants != null);
     }
 
     /**

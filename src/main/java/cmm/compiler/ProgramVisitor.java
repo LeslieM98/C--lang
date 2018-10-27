@@ -12,13 +12,15 @@ import cmm.compiler.utillity.*;
 
 class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
+    ScopeManager scopes;
+
     // constant identifiers
-    private Map<String, String> constTable;
+    // private Map<String, String> constTable;
 
     // Scopes
-    private Map<String, HashMap<String, String>> scopesTable;   // Scopename  -> ScopeTable
-    private final Map<String, String> globalScope;              // Identifier -> field id
-    private Map<String, String> currentScope;                   // Identifier -> local id
+    // private Map<String, HashMap<String, String>> scopesTable;   // Scopename  -> ScopeTable
+    // private final Map<String, String> globalScope;              // Identifier -> field id
+    // private Map<String, String> currentScope;                   // Identifier -> local id
 
     // functionIdentifiers
     private List<Function> definedFunctions;
@@ -26,9 +28,11 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
     public ProgramVisitor(){
         super();
-        constTable = new HashMap<>();
-        globalScope = new HashMap<>();
+        // constTable = new HashMap<>();
+        // globalScope = new HashMap<>();
+        scopes = new ScopeManager();
         definedFunctions = new ArrayList<>();
+
     }
 
     private NativeTypes toNativeTypes(String in){
@@ -45,10 +49,6 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     @Override
     protected List<String> defaultResult() {
         return new ArrayList<>();
-    }
-
-    String getConstant(String constName){
-        return constTable.get(constName);
     }
 
     @Override
@@ -81,7 +81,19 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String name = ctx.dec.variableName.getText();
         String value = ctx.val.getText();
 
-        if(constTable.putIfAbsent(name, value) != null){
+        boolean successfull = true;
+
+        if(!scopes.inLocalScope()){
+            successfull &= scopes.addGlobalConstant(name, value);
+        }
+
+        if(scopes.currentTempScopeDepth() == 0){
+            successfull &= scopes.addLocalConstant(name, Integer.parseInt(value));
+        } else {
+            successfull &= scopes.addTemporaryConstant(name, Integer.parseInt(value));
+        }
+
+        if(!successfull){
             throw new AllreadyDefinedException(tk, "Redefinition of constant");
         }
 
@@ -92,6 +104,7 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     @Override
     public List<String> visitFunction_definition(Function_definitionContext ctx) {
         List<String> asm = new ArrayList<>();
+
 
         // Determine returntype and name
         String name = ctx.function_header().functionName.getText();
@@ -130,6 +143,8 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             throw new AllreadyDefinedException(ctx.function_header().functionName, "Function allready defined");
         }
         definedFunctions.add(f);
+        scopes.createLocalScope(name);
+        scopes.switchContext(name);
 
         StringBuilder methodHead = new StringBuilder()
             .append(".method ")
@@ -152,6 +167,7 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.addAll(visit(ctx.function_body()));
 
         asm.add(".end method");
+        scopes.switchToGlobalContext();
 
         return asm;
     }
