@@ -10,7 +10,7 @@ import cmm.compiler.CmmParser.*;
 import cmm.compiler.exception.*;
 import cmm.compiler.utillity.*;
 
-class ProgramVisitor extends CmmBaseVisitor<List<String>>{
+public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
     ScopeManager scopes;
 
@@ -32,7 +32,6 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         // globalScope = new HashMap<>();
         scopes = new ScopeManager();
         definedFunctions = new ArrayList<>();
-
     }
 
     private NativeTypes toNativeTypes(String in){
@@ -75,6 +74,15 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
     // Context subroutines
 
+
+    /**
+     * As soon as a const declaration occurs, the righthand side of 
+     * the asignment gets treated as a string literal and gets added 
+     * to the const table in the correct scope.
+     * 
+     * @throws AllreadyDefinedException If there is any constant or variable 
+     *          accessible in the current scope this exception will be thrown.
+     */
     @Override
     public List<String> visitConstdec(ConstdecContext ctx) {
         Token tk = ctx.dec.variableName;
@@ -83,13 +91,16 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         boolean successfull = true;
 
+        // Try to add in global scope
         if(!scopes.inLocalScope()){
             successfull &= scopes.addGlobalConstant(name, value);
         }
-
+        
         if(scopes.currentTempScopeDepth() == 0){
+            // Try to add in local scope
             successfull &= scopes.addLocalConstant(name, Integer.parseInt(value));
         } else {
+            // Try to add in current temporary scope
             successfull &= scopes.addTemporaryConstant(name, Integer.parseInt(value));
         }
 
@@ -100,6 +111,14 @@ class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return null;
     }
 
+    /**
+     * Breaks up a function definition into name, return type, parametercount, 
+     * parametertypes. Checks wether it is allready defined. Creates a new 
+     * JVM ASM method with correctly inserted function metadata. 
+     * Evaluates the sourcecode inside the function within the correct scope context.
+     * 
+     * @throws AllreadyDefinedException If the function was allready defined.
+     */
     // TODO: Check for correct return
     @Override
     public List<String> visitFunction_definition(Function_definitionContext ctx) {
