@@ -216,7 +216,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         
 
         String trueL, doneL;
-        trueL = "EqTrue" + eqCounter;
+        trueL = "EqBranch" + eqCounter;
         doneL = "EqualFinish" + eqCounter;
 
         asm.add("if_icmpeq " + trueL);
@@ -246,7 +246,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.addAll(visit(ctx.right));
 
         String trueL, doneL;
-        trueL = "NeTrue" + eqCounter;
+        trueL = "NeBranch" + eqCounter;
         doneL = "NeDone" + eqCounter;
 
         asm.add("if_icmpne " + trueL);
@@ -278,8 +278,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         List<String> asm = visit(ctx.expr);
 
         String notL, doneL;
-        notL = "Not"+notCounter;
-        doneL = "NotDone"+notCounter;
+        notL = "NotBranch" + notCounter;
+        doneL = "NotDone" + notCounter;
 
         asm.add("ifeq " + notL);
         asm.add("ldc0");
@@ -317,10 +317,40 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     @Override
     public List<String> visitOr(OrContext ctx) {
+
         List<String> asm = visit(ctx.left);
         asm.addAll(visit(ctx.right));
 
         asm.add("ior");
+
+        return asm;
+    }
+
+
+    private int ltCounter;
+    /**
+     * Performs {@code left < right}.
+     * 
+     * If the expression evaluates to true a 1 will be pushed to the stack, otherwise a 0.
+     */
+    @Override
+    public List<String> visitLess(LessContext ctx) {
+        List<String> asm = visit(ctx.left);
+        asm.addAll(visit(ctx.right));
+
+        String ltL, ltDoneL;
+        ltL = "ltBranch" + ltCounter;
+        ltDoneL = "ltDone" + ltCounter;
+        
+        asm.add("isub");
+        asm.add("iflt");
+        asm.add("ldc 0");
+        asm.add("goto " + ltDoneL);
+        asm.add(ltL + ":");
+        asm.add("ldc 1");
+        asm.add(ltDoneL + ":");
+
+        ltCounter++;
 
         return asm;
     }
