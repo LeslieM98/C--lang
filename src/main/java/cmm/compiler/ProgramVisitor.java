@@ -304,4 +304,20 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
+    /**
+     * Performs the bitwise OR operation.<br>
+     * 
+     * Assuming both operands are on top the stack. 
+     * Performs a standard OR operation between 2 values. 
+     * Works for boolean logic and integer logic.
+     */
+    @Override
+    public List<String> visitOr(OrContext ctx) {
+        List<String> asm = new ArrayList<>();
+
+        asm.add("ior");
+
+        return asm;
+    }
+
 }
