@@ -6,7 +6,8 @@ import java.util.*;
 
 import org.antlr.v4.runtime.Token;
 
-import cmm.compiler.CmmParser.*;
+import cmm.compiler.generated.CmmParser.*;
+import cmm.compiler.generated.*;
 import cmm.compiler.exception.*;
 import cmm.compiler.utillity.*;
 

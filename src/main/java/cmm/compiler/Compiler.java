@@ -13,6 +13,8 @@ import java.util.*;
 
 import jas.jasError;
 
+import cmm.compiler.generated.*;
+
 public class Compiler{
 
     

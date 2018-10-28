@@ -55,7 +55,7 @@
             <configuration>
               <arguments>
                 <argument>-package</argument>
-                <argument>cmm.compiler</argument>
+                <argument>cmm.compiler.generated</argument>
               </arguments>
             </configuration>       
           </execution>
