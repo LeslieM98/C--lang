@@ -110,7 +110,10 @@ expression
     | left=expression operator='*' right=expression #Multiplication
     | left=expression operator='-' right=expression #Minus
     | left=expression operator='+' right=expression #Plus
-    | left=expression operator=('<' | '<=' | '>' | '>=') right=expression #Relational
+    | left=expression '<' right=expression #Less
+    | left=expression '<=' right=expression #LessEq
+    | left=expression '>' right=expression #Greater
+    | left=expression '>=' right=expression #GreaerEq
     | '!' expr=expression #Not
     | left=expression '!=' right=expression #NotEquals
     | left=expression '==' right=expression #Equals
