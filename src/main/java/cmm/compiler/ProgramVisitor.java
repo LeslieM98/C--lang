@@ -15,24 +15,17 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
     ScopeManager scopes;
 
-    // constant identifiers
-    // private Map<String, String> constTable;
-
-    // Scopes
-    // private Map<String, HashMap<String, String>> scopesTable;   // Scopename  -> ScopeTable
-    // private final Map<String, String> globalScope;              // Identifier -> field id
-    // private Map<String, String> currentScope;                   // Identifier -> local id
-
     // functionIdentifiers
     private List<Function> definedFunctions;
 
 
     public ProgramVisitor(){
         super();
-        // constTable = new HashMap<>();
-        // globalScope = new HashMap<>();
         scopes = new ScopeManager();
         definedFunctions = new ArrayList<>();
+
+        // specific countervars for visit functions
+        // eqCounter = 0;
     }
 
     private NativeTypes toNativeTypes(String in){
@@ -131,6 +124,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      * @throws AllreadyDefinedException If the function was allready defined.
      */
     // TODO: Check for correct return
+    // TODO: locals and stacksize
     @Override
     public List<String> visitFunction_definition(Function_definitionContext ctx) {
         List<String> asm = new ArrayList<>();
@@ -198,6 +192,96 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         asm.add(".end method");
         scopes.switchToGlobalContext();
+
+        return asm;
+    }
+
+
+
+
+    /**
+     * Used to identify jumplabels in the equals visitor.
+     */
+    private int eqCounter;
+    /**
+     * Pushes 1 on the stack if both are equal, 0 if not.<br>
+     * 
+     * Assuming both operands are on the top of the stack.
+     */
+    // TODO: Optimize asm
+    @Override
+    public List<String> visitEquals(EqualsContext ctx) {
+        List<String> asm = new ArrayList<>();
+
+        String trueL, doneL;
+        trueL = "EqTrue" + eqCounter;
+        doneL = "EqualFinish" + eqCounter;
+
+        asm.add("if_icmpeq " + trueL);
+        asm.add("ldc 0");
+        asm.add("goto " + doneL);
+        asm.add(trueL + ":");
+        asm.add("ldc 1");
+        asm.add(doneL + ":");
+
+        eqCounter++;
+
+        return asm;
+    }
+
+    /**
+     * Used to identify jumplabels in the not equals visitor.
+     */
+    private int neqCounter;
+    /**
+     * Pushes 1 on the stack if both are not equal, 1 if they are.<br>
+     * 
+     * Assuming both operands are on the top of the stack.
+     */
+    @Override
+    public List<String> visitNotEquals(NotEqualsContext ctx) {
+        List<String> asm = new ArrayList<>();
+
+        String trueL, doneL;
+        trueL = "NeTrue" + eqCounter;
+        doneL = "NeDone" + eqCounter;
+
+        asm.add("if_icmpne " + trueL);
+        asm.add("ldc 0");
+        asm.add("goto " + doneL);
+        asm.add(trueL + ":");
+        asm.add("ldc 1");
+        asm.add(doneL + ":");
+
+        neqCounter++;
+
+        return asm;
+    }
+
+
+    /**
+     * Used to identify jumplabels in the not operation.
+     */
+    private int notCounter;
+    /**
+     * Inverts a boolean value.<br>
+     * 
+     * Values equal to 0 will be transformed to a 1. Nonzero values will be transformed to 0.
+     */
+    @Override
+    public List<String> visitNot(NotContext ctx) {
+        List<String> asm = new ArrayList<>();
+
+        String notL, doneL;
+        notL = "Not"+notCounter;
+        doneL = "NotDone"+notCounter;
+
+        asm.add("ifeq " + notL);
+        asm.add("ldc0");
+        asm.add("goto " + doneL);
+        asm.add(notL + ":");
+        asm.add("ldc 1");
+        asm.add(doneL + ":");
 
         return asm;
     }

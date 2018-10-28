@@ -10,6 +10,7 @@ dependency-reduced-pom.xml
 
 # Antlr generated files
 src/main/antlr4/cmm/compiler/.antlr
+.antlr/
 
 # IDE specific files
 #   VSCode

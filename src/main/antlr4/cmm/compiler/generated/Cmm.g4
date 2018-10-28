@@ -112,12 +112,12 @@ expression
     | left=expression operator='+' right=expression #Plus
     | left=expression operator=('<' | '<=' | '>' | '>=') right=expression #Relational
     | '!' expr=expression #Not
-    | left=expression operator=('==' | '!=') right=expression #Eq
-    | left=expression operator='&&' right=expression #And
-    | left=expression operator='||' right=expression #Or
+    | left=expression '!=' right=expression #NotEquals
+    | left=expression '==' right=expression #Equals
+    | left=expression '&&' right=expression #And
+    | left=expression '||' right=expression #Or
     | '(' expr=expression ')' #Parenthesis
     | number=NUMBER #Number
-    | character=CHARACTER #Character
     | variableName=IDENTIFIER #Variable
     | function_call #FunctionCallExpression
     ;
