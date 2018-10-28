@@ -297,7 +297,7 @@ public class ScopeManager {
     }
 
     /**
-     * Adds a constant to the local scope.
+     * Adds a constant to the global scope.
      * Inserts a value with the given identifier to the global scope.
      * Also checks if the identifier was defined already in the current scope.
      * @param identifier A string to identifiy the constant.

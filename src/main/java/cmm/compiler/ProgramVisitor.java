@@ -36,25 +36,35 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
     private NativeTypes toNativeTypes(String in){
-        if(in.equals("void")){
-            return NativeTypes.VOID;
-        } else if(in.equals("num")){
-            return NativeTypes.NUM;
-        } else if(in.equals("char")){
-            return NativeTypes.CHARACTER;
+        switch(in){
+            case "void":
+                return NativeTypes.VOID;
+            case "num":
+                return NativeTypes.NUM;
+            default:
+                return null;
         }
+    }
+
+
+    /**
+     * Basically every not implemented visit method returns a call to this method.
+     */
+    @Override
+    protected List<String> defaultResult() {
         return null;
     }
 
-    @Override
-    protected List<String> defaultResult() {
-        return new ArrayList<>();
-    }
-
+    /**
+     * When multiple children are visited in a default 
+     * implemented method, they get aggregated using this function.<br>
+     * Basically appending {@code aggregate} to a new List and then 
+     * appending {@code nextResult} to that new List.
+     */
     @Override
     protected List<String> aggregateResult(List<String> aggregate, List<String> nextResult) {
         if(aggregate == null && nextResult == null){
-            return new ArrayList<>();
+            return null;
         }
 
         if(aggregate == null){
@@ -191,4 +201,5 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         return asm;
     }
+
 }
