@@ -234,7 +234,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     private int neqCounter;
     /**
-     * Pushes 1 on the stack if both are not equal, 1 if they are.<br>
+     * Pushes a 1 on the stack if both are not equal, 0 if they are.<br>
      * 
      * Assuming both operands are on the top of the stack.
      */
@@ -266,7 +266,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     /**
      * Inverts a boolean value.<br>
      * 
-     * Values equal to 0 will be transformed to a 1. Nonzero values will be transformed to 0.
+     * Assuming the operand is on top of the stack.
+     * Values equal to 0 will be transformed to a 1 value. 
+     * nonzero values will be transformed to 0.
      */
     @Override
     public List<String> visitNot(NotContext ctx) {
@@ -282,6 +284,22 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.add(notL + ":");
         asm.add("ldc 1");
         asm.add(doneL + ":");
+
+        return asm;
+    }
+
+    /**
+     * Performs the bitwise AND operation.<br>
+     * 
+     * Assuming both operands are on top the stack. 
+     * Performs a standard AND operation between 2 values. 
+     * Works for boolean logic and integer logic.
+     */
+    @Override
+    public List<String> visitAnd(AndContext ctx) {
+        List<String> asm = new ArrayList<>();
+
+        asm.add("iand");
 
         return asm;
     }
