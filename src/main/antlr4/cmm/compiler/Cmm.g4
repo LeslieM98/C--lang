@@ -106,14 +106,15 @@ loop
     ;
 
 expression
-    : left=expression '/' right=expression #Division
-    | left=expression '*' right=expression #Multiplication
-    | left=expression '-' right=expression #Minus
-    | left=expression '+' right=expression #Plus
+    : left=expression operator='/' right=expression #Division
+    | left=expression operator='*' right=expression #Multiplication
+    | left=expression operator='-' right=expression #Minus
+    | left=expression operator='+' right=expression #Plus
     | left=expression operator=('<' | '<=' | '>' | '>=') right=expression #Relational
-    | left=expression '&&' right=expression #And
-    | left=expression '||' right=expression #Or
     | '!' expr=expression #Not
+    | left=expression operator=('==' | '!=') right=expression #Eq
+    | left=expression operator='&&' right=expression #And
+    | left=expression operator='||' right=expression #Or
     | '(' expr=expression ')' #Parenthesis
     | number=NUMBER #Number
     | character=CHARACTER #Character

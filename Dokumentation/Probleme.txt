@@ -22,3 +22,10 @@ Problem: Representation von Funktionen
 	- Datenklasse erstellen die nur wichtigste metadaten zu einer funktion enthält
 	- Erkennen der anzahl von funktionsparametern schwierig
 -->		- Mit offset durch token iterieren um parameter zu filtern
+
+
+Problem: Boolsche algebra, wahrheitswerte.
+	- Wann ist ein wert true und wann false?
+-->		0 = false, !0 = true;
+	- Welche operator reihenfolge?
+	
