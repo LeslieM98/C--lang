@@ -26,6 +26,6 @@ Problem: Representation von Funktionen
 
 Problem: Boolsche algebra, wahrheitswerte.
 	- Wann ist ein wert true und wann false?
--->		0 = false, !0 = true;
-	- Welche operator reihenfolge?
+-->		0 = false, !false = true;
+	- richtige jumpreihen folge bei befeheln die nicht von JVM vorgegeben sind
 	
