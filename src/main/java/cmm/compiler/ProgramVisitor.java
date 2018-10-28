@@ -170,6 +170,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         scopes.createLocalScope(name);
         scopes.switchContext(name);
 
+        // Generate Jasmin
         StringBuilder methodHead = new StringBuilder()
             .append(".method ")
             .append("public ")
@@ -225,7 +226,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     // TODO: Optimize asm
     @Override
     public List<String> visitEquality(EqualityContext ctx) {
+        // Load left side of operation to stack
         List<String> asm = visit(ctx.left);
+
+        // Load right side of operation to stack
         asm.addAll(visit(ctx.right));        
 
         String trueL, doneL;
@@ -260,6 +264,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     @Override
     public List<String> visitNot(NotContext ctx) {
+        // Load operand to stack
         List<String> asm = visit(ctx.expr);
 
         String notL, doneL;
@@ -285,7 +290,11 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     @Override
     public List<String> visitAnd(AndContext ctx) {
+
+        // Load left side of operation to stack
         List<String> asm = visit(ctx.left);
+
+        // Load right side of operation to stack
         asm.addAll(visit(ctx.right));
 
         asm.add("iand");
@@ -345,8 +354,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.addAll(visit(ctx.right));
 
         String relationalL, relationalDoneL;
-        relationalL = "ltBranch" + relationalCounter;
-        relationalDoneL = "ltDone" + relationalCounter;
+        relationalL = "relBranch" + relationalCounter;
+        relationalDoneL = "relDone" + relationalCounter;
 
         String instruction = determineRelationalOperation(ctx.operator.getText());
         
