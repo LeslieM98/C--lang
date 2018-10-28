@@ -206,12 +206,14 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     /**
      * Pushes 1 on the stack if both are equal, 0 if not.<br>
      * 
-     * Assuming both operands are on the top of the stack.
      */
     // TODO: Optimize asm
     @Override
     public List<String> visitEquals(EqualsContext ctx) {
-        List<String> asm = new ArrayList<>();
+        List<String> asm = visit(ctx.left);
+        asm.addAll(visit(ctx.right));
+
+        
 
         String trueL, doneL;
         trueL = "EqTrue" + eqCounter;
@@ -240,7 +242,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     @Override
     public List<String> visitNotEquals(NotEqualsContext ctx) {
-        List<String> asm = new ArrayList<>();
+        List<String> asm = visit(ctx.left);
+        asm.addAll(visit(ctx.right));
 
         String trueL, doneL;
         trueL = "NeTrue" + eqCounter;
@@ -272,7 +275,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     @Override
     public List<String> visitNot(NotContext ctx) {
-        List<String> asm = new ArrayList<>();
+        List<String> asm = visit(ctx.expr);
 
         String notL, doneL;
         notL = "Not"+notCounter;
@@ -297,7 +300,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     @Override
     public List<String> visitAnd(AndContext ctx) {
-        List<String> asm = new ArrayList<>();
+        List<String> asm = visit(ctx.left);
+        asm.addAll(visit(ctx.right));
 
         asm.add("iand");
 
@@ -313,11 +317,13 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     @Override
     public List<String> visitOr(OrContext ctx) {
-        List<String> asm = new ArrayList<>();
+        List<String> asm = visit(ctx.left);
+        asm.addAll(visit(ctx.right));
 
         asm.add("ior");
 
         return asm;
     }
+
 
 }
