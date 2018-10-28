@@ -57,7 +57,7 @@ public class App{
                 System.exit(1);
             }
 
-        } else if(args[0].equals("--help"){
+        } else if(args[0].equals("--help")){
             System.out.println(HELP_MSG);
             System.exit(0);
         } else {
