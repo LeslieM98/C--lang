@@ -196,30 +196,45 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
-
+    /**
+     * Used to transform an equality operator to a JVM instruction. 
+     * Can only transform ==, !=.
+     * @param operator An equality operator mentiioned above.
+     * @return A corresponding JVM instruction.
+     */
+    private String determineEqualityOperation(String operator){
+        switch(operator){
+            case "==" : return "if_icmpeq";
+            case "!=" : return "if_icmpne";
+            default  : return  null ;
+        }
+    }
 
 
     /**
-     * Used to identify jumplabels in the equals visitor.
+     * Used to identify jumplabels in the equality visitor.
      */
     private int eqCounter;
     /**
-     * Pushes 1 on the stack if both are equal, 0 if not.<br>
+     * Performs an equality operation. Pops 2 operands off the stack.
+     * Allways results in either 1 or 0 depending on which operation. <br>
+     * {@code ==}: push 1 if both are equal, 0 if both are different. <br>
+     * {@code !=}: push 1 if both are different, 0 if both are equal. 
      * 
      */
     // TODO: Optimize asm
     @Override
-    public List<String> visitEquals(EqualsContext ctx) {
+    public List<String> visitEquality(EqualityContext ctx) {
         List<String> asm = visit(ctx.left);
-        asm.addAll(visit(ctx.right));
-
-        
+        asm.addAll(visit(ctx.right));        
 
         String trueL, doneL;
         trueL = "EqBranch" + eqCounter;
         doneL = "EqualFinish" + eqCounter;
 
-        asm.add("if_icmpeq " + trueL);
+        String instruction = determineEqualityOperation(ctx.operator.getText());
+
+        asm.add("instruction " + trueL);
         asm.add("ldc 0");
         asm.add("goto " + doneL);
         asm.add(trueL + ":");
@@ -227,36 +242,6 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.add(doneL + ":");
 
         eqCounter++;
-
-        return asm;
-    }
-
-    /**
-     * Used to identify jumplabels in the not equals visitor.
-     */
-    private int neqCounter;
-    /**
-     * Pushes a 1 on the stack if both are not equal, 0 if they are.<br>
-     * 
-     * Assuming both operands are on the top of the stack.
-     */
-    @Override
-    public List<String> visitNotEquals(NotEqualsContext ctx) {
-        List<String> asm = visit(ctx.left);
-        asm.addAll(visit(ctx.right));
-
-        String trueL, doneL;
-        trueL = "NeBranch" + eqCounter;
-        doneL = "NeDone" + eqCounter;
-
-        asm.add("if_icmpne " + trueL);
-        asm.add("ldc 0");
-        asm.add("goto " + doneL);
-        asm.add(trueL + ":");
-        asm.add("ldc 1");
-        asm.add(doneL + ":");
-
-        neqCounter++;
 
         return asm;
     }
@@ -349,8 +334,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     private int relationalCounter;
     /**
      * Performs a relational operation resulting in either 1 or 0. 
-     * Relational operations contain {@code <, >, <=, >=}.
+     * Relational operations contain {@code <, >, <=, >=}. <br>
      * 
+     * Pops 2 integers off the stack.
      * If the expression evaluates to true a 1 will be pushed to the stack, otherwise a 0.
      */
     @Override

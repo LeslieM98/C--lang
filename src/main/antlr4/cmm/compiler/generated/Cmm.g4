@@ -112,8 +112,7 @@ expression
     | left=expression operator='+' right=expression #Plus
     | left=expression operator=('<' | '>' | '<=' | '>=') right=expression #Relational
     | '!' expr=expression #Not
-    | left=expression '!=' right=expression #NotEquals
-    | left=expression '==' right=expression #Equals
+    | left=expression operator=('==' | '!=')right=expression #Equality
     | left=expression '&&' right=expression #And
     | left=expression '||' right=expression #Or
     | '(' expr=expression ')' #Parenthesis
