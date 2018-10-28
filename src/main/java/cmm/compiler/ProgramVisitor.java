@@ -327,33 +327,57 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
 
-    private int ltCounter;
     /**
-     * Performs {@code left < right}.
+     * Used to transform a relational operator to a JVM isntruction. 
+     * Can only transform <, >, <=, >=.
+     * @param operator A relational operator mentiioned above.
+     * @return A corresponding JVM instruction.
+     */
+    private String determineRelationalOperation(String operator){
+        switch(operator){
+            case "<" : return "iflt";
+            case ">" : return "ifgt";
+            case "<=": return "ifle";
+            case ">=": return "ifge";
+            default  : return  null ;
+        }
+    }
+
+    /**
+     * Used to identify jumplabels in a relational operation.
+     */
+    private int relationalCounter;
+    /**
+     * Performs a relational operation resulting in either 1 or 0. 
+     * Relational operations contain {@code <, >, <=, >=}.
      * 
      * If the expression evaluates to true a 1 will be pushed to the stack, otherwise a 0.
      */
     @Override
-    public List<String> visitLess(LessContext ctx) {
+    public List<String> visitRelational(RelationalContext ctx) {
         List<String> asm = visit(ctx.left);
         asm.addAll(visit(ctx.right));
 
-        String ltL, ltDoneL;
-        ltL = "ltBranch" + ltCounter;
-        ltDoneL = "ltDone" + ltCounter;
+        String relationalL, relationalDoneL;
+        relationalL = "ltBranch" + relationalCounter;
+        relationalDoneL = "ltDone" + relationalCounter;
+
+        String instruction = determineRelationalOperation(ctx.operator.getText());
         
         asm.add("isub");
-        asm.add("iflt");
+        asm.add(instruction + " " + relationalDoneL);
         asm.add("ldc 0");
-        asm.add("goto " + ltDoneL);
-        asm.add(ltL + ":");
+        asm.add("goto " + relationalDoneL);
+        asm.add(relationalL + ":");
         asm.add("ldc 1");
-        asm.add(ltDoneL + ":");
+        asm.add(relationalDoneL + ":");
 
-        ltCounter++;
+        relationalCounter++;
 
         return asm;
     }
+
+
 
 
 }
