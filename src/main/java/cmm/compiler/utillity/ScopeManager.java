@@ -48,8 +48,8 @@ public class ScopeManager {
         currentConstants = null;
         currentVariables = null;
 
-        temporaryConstants = null;
-        temporaryVariables = null;
+        temporaryConstants = new ArrayList<>();
+        temporaryVariables = new ArrayList<>();
 
         localVariableScopes = new HashMap<>();
         localConstantScopes = new HashMap<>();
@@ -147,13 +147,17 @@ public class ScopeManager {
      */
     private Pair<Type, Integer> getLocal(String identifier){
 
-        Integer tmp = currentConstants.get(identifier);
+        Integer tmp = null;
+        if(currentConstants != null){
+            tmp = currentConstants.get(identifier);
+        }
 
         if(tmp != null){
             return new Pair<>(Type.CONSTANT, tmp);
         }
-
-        tmp = currentVariables.get(identifier);
+        if(currentVariables != null){
+            tmp = currentVariables.get(identifier);
+        }
         if(tmp != null){
             return new Pair<>(Type.VARIABLE, tmp);
         }

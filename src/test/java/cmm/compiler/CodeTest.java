@@ -231,8 +231,8 @@ public class CodeTest{
     }
 
     public static void main(String[] args) {
-        ParseTree tree = createParser(Paths.get("test.txt")).program();
-        ProgramVisitor v = new ProgramVisitor();
-        v.visit(tree);
+        App a = new App();
+        String[] arg = {"-j", "test.txt"};
+        a.start(arg);
     }
 }

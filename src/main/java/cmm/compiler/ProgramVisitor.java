@@ -45,7 +45,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     @Override
     protected List<String> defaultResult() {
-        return null;
+        return new ArrayList<>();
     }
 
     /**
@@ -57,7 +57,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     @Override
     protected List<String> aggregateResult(List<String> aggregate, List<String> nextResult) {
         if(aggregate == null && nextResult == null){
-            return null;
+            return new ArrayList<>();
         }
 
         if(aggregate == null){
@@ -98,14 +98,14 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         // Try to add in global scope
         if(!scopes.inLocalScope()){
             successfull &= scopes.addGlobalConstant(name, value);
-        }
-        
-        if(scopes.currentTempScopeDepth() == 0){
-            // Try to add in local scope
-            successfull &= scopes.addLocalConstant(name, Integer.parseInt(value));
         } else {
-            // Try to add in current temporary scope
-            successfull &= scopes.addTemporaryConstant(name, Integer.parseInt(value));
+            if(scopes.currentTempScopeDepth() == 0){
+                // Try to add in local scope
+                successfull &= scopes.addLocalConstant(name, Integer.parseInt(value));
+            } else {
+                // Try to add in current temporary scope
+                successfull &= scopes.addTemporaryConstant(name, Integer.parseInt(value));
+            }
         }
 
         if(!successfull){
@@ -242,7 +242,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         List<String> asm = visit(ctx.left);
 
         // Load right side of operation to stack
-        asm.addAll(visit(ctx.right));        
+        List<String> asmRight = visit(ctx.right);
+        asm.addAll(asmRight);        
 
         String trueL, doneL;
         trueL = "EqBranch" + eqCounter;

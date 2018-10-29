@@ -61,6 +61,7 @@ parameter_list
 
 function_body
     : '{' statements=statementList 'return' returnValue=expression SEMICOLON '}'
+    | '{' statements=statementList '}'
     ;
 
 block
