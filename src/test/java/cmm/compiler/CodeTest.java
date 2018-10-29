@@ -388,7 +388,7 @@ public class CodeTest{
         // can create constants with the same name as f1
         s.addLocalConstant("la", 0);
         s.addLocalConstant("lc", 0);
-        s.addLocalConstant("lc", 0)
+        s.addLocalConstant("lc", 0);
 
         assertEquals(s.get("la"), new Pair<Type, Integer>(Type.CONSTANT, 0));
         assertEquals(s.get("lb"), new Pair<Type, Integer>(Type.CONSTANT, 0));
