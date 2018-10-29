@@ -115,11 +115,17 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return null;
     }
 
+
+
+    private static final Function PROGRAM_ENTRY = new Function(NativeTypes.VOID, "main");
     /**
      * Breaks up a function definition into name, return type, parametercount, 
      * parametertypes. Checks wether it is allready defined. Creates a new 
      * JVM ASM method with correctly inserted function metadata. 
-     * Evaluates the sourcecode inside the function within the correct scope context.
+     * Evaluates the sourcecode inside the function within the correct scope context.<br>
+     * <br>
+     * If a function was recognized having the signature {@code void main(){...}} it 
+     * is considered as programentry and will be compiled as such.
      * 
      * @throws AllreadyDefinedException If the function was allready defined.
      */
@@ -176,13 +182,19 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             .append("public ")
             .append("static ")
             .append(name)
-            .append("(")
-            .append((paramcount == 0) ? "V" : "");
+            .append("(");
+            if(f.equals(PROGRAM_ENTRY)){
+                methodHead.append("[Ljava/lang/String;");
+            } else {
+                methodHead.append((paramcount == 0) ? "V" : "");
 
-        // Append parameters
-        for(int i = 0; i < paramcount; i++){
-            methodHead.append("I");
-        }
+                // Append parameters
+                for(int i = 0; i < paramcount; i++){
+                    methodHead.append("I");
+                }
+            }
+
+
 
         methodHead.append(")")
             .append(f.getReturnType() == NativeTypes.VOID ? "V" : "I");
