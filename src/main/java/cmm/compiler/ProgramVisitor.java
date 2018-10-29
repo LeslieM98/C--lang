@@ -173,8 +173,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             throw new AllreadyDefinedException(ctx.function_header().functionName, "Function allready defined");
         }
         definedFunctions.add(f);
-        scopes.createLocalScope(name);
-        scopes.switchContext(name);
+        scopes.createLocalScope(f);
+        scopes.switchContext(f);
 
         // Generate Jasmin
         StringBuilder methodHead = new StringBuilder()

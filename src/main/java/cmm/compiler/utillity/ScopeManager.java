@@ -33,8 +33,8 @@ public class ScopeManager {
     private List<Map<String, Integer>> temporaryConstants;
     private List<Map<String, Integer>> temporaryVariables;
 
-    private Map<String, Map<String, Integer>> localConstantScopes;
-    private Map<String, Map<String, Integer>> localVariableScopes;
+    private Map<Function, Map<String, Integer>> localConstantScopes;
+    private Map<Function, Map<String, Integer>> localVariableScopes;
 
 
 
@@ -198,7 +198,7 @@ public class ScopeManager {
      * @param scopeIdentifier An identifier that represents the scope.
      * @return true if sucessfully switched, false if not.
      */
-    public boolean switchContext(String scopeIdentifier){
+    public boolean switchContext(Function scopeIdentifier){
         Map<String, Integer> tmpConst = localConstantScopes.get(scopeIdentifier);
         Map<String, Integer> tmpVar   = localVariableScopes.get(scopeIdentifier);
 
@@ -231,7 +231,7 @@ public class ScopeManager {
      * @param scopeIdentifier A string that identifies the new scope.
      * @return True if succesfully created, false if otherwise.
      */
-    public boolean createLocalScope(String scopeIdentifier){
+    public boolean createLocalScope(Function scopeIdentifier){
         if(localConstantScopes.containsKey(scopeIdentifier) || localVariableScopes.containsKey(scopeIdentifier)){
             return false;
         }
