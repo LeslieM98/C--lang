@@ -115,15 +115,14 @@ public class Function{
 
     /**
      * Checks for equality.
-     * Checks wether name, returntype and order/type of parameters are the same.
+     * Checks wether the signature of the function is the same.
      * @return True if equal, false if not.
      */
     @Override
     public boolean equals(Object obj) {
         if (obj != null && getClass() == obj.getClass()) {
             Function o = (Function)obj;
-            boolean b;
-            b  = returnType == o.returnType;
+            boolean b = true;;
             b &= identifier.equals(o.identifier);
             if(o.parameterList.size() != parameterList.size()){
                 return false;

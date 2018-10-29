@@ -251,7 +251,8 @@ public class CodeTest{
         assertEquals(s.getGlobal("b"), new Pair<Type, String>(Type.CONSTANT, "2"));
         assertEquals(s.getGlobal("c"), new Pair<Type, String>(Type.CONSTANT, "3"));
 
-        // Test if local variables return the correct value
+        Function f1;
+
 
     }
 
