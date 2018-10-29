@@ -295,6 +295,7 @@ public class ScopeManager {
      */
     public boolean addLocalConstant(String identifier, int val){
         if(get(identifier) != null) return false;
+        if(getGlobal(identifier) != null) return false;
 
         currentConstants.put(identifier, val);
         return true;

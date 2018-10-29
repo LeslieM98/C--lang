@@ -131,6 +131,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     // TODO: Check for correct return
     // TODO: locals and stacksize
+    // TODO: insert parameters correctly
     @Override
     public List<String> visitFunction_definition(Function_definitionContext ctx) {
         List<String> asm = new ArrayList<>();
