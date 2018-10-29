@@ -387,5 +387,39 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
 
 
+    @Override
+    public List<String> visitVariable(VariableContext ctx) {
+        List<String> asm = new ArrayList<>();
+        
+        Pair<ScopeManager.Type, String> glob = scopes.getGlobal(ctx.variableName.getText());
+        Pair<ScopeManager.Type, Integer> loc = scopes.get(ctx.variableName.getText());
+
+        if(glob != null){
+            switch(glob.getLeft()){
+                case CONSTANT: 
+                    asm.add("ldc " + glob.getRight());
+                    break;
+            }
+        } else if(loc != null){
+            switch(loc.getLeft()){
+                case CONSTANT:
+                    asm.add("ldc " + loc.getRight());
+                    break;
+            }
+
+        } else {
+
+        }
+
+
+
+
+
+
+        return asm;
+    }
+
+
+
 
 }
