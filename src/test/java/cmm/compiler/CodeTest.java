@@ -1,5 +1,8 @@
 package cmm.compiler;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,7 +23,8 @@ import org.junit.jupiter.api.*;
 
 import cmm.compiler.exception.*;
 import cmm.compiler.generated.*;
-
+import cmm.compiler.utillity.*;
+import cmm.compiler.utillity.ScopeManager.Type;
 import jas.jasError;
 import jasmin.ClassFile;
 
@@ -227,6 +231,27 @@ public class CodeTest{
         // } catch (Exception e){
         //     Assertions.fail("Exception was thrown" + e.getMessage());
         // }
+
+    }
+
+    @Test
+    public void testScopeManager(){
+        ScopeManager s = new ScopeManager();
+
+        // Test if global constants return correct value
+        s.addGlobalConstant("a", "1");
+        s.addGlobalConstant("b", "2");
+        s.addGlobalConstant("c", "3");
+
+        assertNull(s.get("a"));
+        assertNull(s.get("b"));
+        assertNull(s.get("c"));
+
+        assertEquals(s.getGlobal("a"), new Pair<Type, String>(Type.CONSTANT, "1"));
+        assertEquals(s.getGlobal("b"), new Pair<Type, String>(Type.CONSTANT, "2"));
+        assertEquals(s.getGlobal("c"), new Pair<Type, String>(Type.CONSTANT, "3"));
+
+        // Test if local variables return the correct value
 
     }
 
