@@ -10,6 +10,7 @@ import cmm.compiler.generated.CmmParser.*;
 import cmm.compiler.generated.*;
 import cmm.compiler.exception.*;
 import cmm.compiler.utillity.*;
+import jas.IincInsn;
 
 public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
@@ -77,6 +78,14 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
     // Context subroutines
+
+    @Override
+    public List<String> visitPrintln(PrintlnContext ctx) {
+        String variableName = ctx.variableName.getText();
+        String value = ctx.value.getText();
+        // TODO Implement Jasmin Intstructions to return
+        return super.visitPrintln(ctx);
+    }
 
 
     /**
