@@ -78,15 +78,21 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
     // Context subroutines
-
+    
+    /**
+     * Println java Function will be called when user wants to output any
+     * expression onto the screen.
+     * @return statements that first load the System.out Object onto the stack
+     *         then loads the value of expression and then call println method
+     */
     @Override
     public List<String> visitPrintln(PrintlnContext ctx) {
-        String variableName = ctx.variableName.getText();
-        String value = ctx.value.getText();
-        // TODO Implement Jasmin Intstructions to return
-        return super.visitPrintln(ctx);
+        List<String> asm = new ArrayList<>();
+        asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
+        asm.addAll(visit(ctx.expr));
+        asm.add("invokevirtual java/io/PrintStream/println(D)V");
+        return asm;
     }
-
 
     /**
      * As soon as a const declaration occurs, the righthand side of 

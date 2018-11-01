@@ -79,8 +79,7 @@ statement
 
 // This is a utility convention to actually output something during program execution
 println
-    : 'println(' variableName=IDENTIFIER ')' SEMICOLON
-    | 'println(' value=NUMBER ')' SEMICOLON
+    : 'println(' expr=expression ')' SEMICOLON
     ;
 
 statementList
