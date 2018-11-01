@@ -74,6 +74,12 @@ statement
 	| assign_operation SEMICOLON
 	| branch
 	| loop
+    | println
+    ;
+
+// This is a utility convention to actually output something during program execution
+println
+    : 'println(' expr=expression ')' SEMICOLON
     ;
 
 statementList
