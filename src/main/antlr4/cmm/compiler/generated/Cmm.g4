@@ -73,11 +73,11 @@ statement
 	| assign_operation SEMICOLON
 	| branch
 	| loop
-    | returnstatement
+    | returnstatement SEMICOLON
     ;
 
 returnstatement
-    : 'return ' returnValue=expression
+    : 'return' returnValue=expression
     ;
 
 

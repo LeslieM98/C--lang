@@ -10,6 +10,7 @@ import cmm.compiler.generated.CmmParser.*;
 import cmm.compiler.generated.*;
 import cmm.compiler.exception.*;
 import cmm.compiler.utillity.*;
+import cmm.compiler.utillity.ScopeManager.Type;
 import jas.IincInsn;
 
 public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
@@ -79,21 +80,6 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
     // Context subroutines
     
-    /**
-     * Println java Function will be called when user wants to output any
-     * expression onto the screen.
-     * @return statements that first load the System.out Object onto the stack
-     *         then loads the value of expression and then call println method
-     */
-    @Override
-    public List<String> visitPrintln(PrintlnContext ctx) {
-        List<String> asm = new ArrayList<>();
-        asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
-        asm.addAll(visit(ctx.expr));
-        asm.add("invokevirtual java/io/PrintStream/println(D)V");
-        return asm;
-    }
-
     /**
      * As soon as a const declaration occurs, the righthand side of 
      * the asignment gets treated as a string literal and gets added 
@@ -222,6 +208,27 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.add(".end method");
         scopes.switchToGlobalContext();
 
+        return asm;
+    }
+
+    @Override
+    public List<String> visitFunction_call(Function_callContext ctx) {
+        String functionName = ctx.functionName.getText();
+        List<String> asm = new ArrayList<>();
+        if ("println".equals(functionName)) {
+            asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
+            String toPrint = ctx.arguments.expression.getText();
+            double value;
+            try {
+                value = Double.valueOf(toPrint);
+                asm.add("ldc " + value);
+            } catch(NumberFormatException e) {
+                Pair<Type, Integer> varToLoad = scopes.get(toPrint);
+                asm.add("iload " + varToLoad.getRight());
+            }
+            asm.add("invokevirtual java/io/PrintStream/println(D)V");    
+        }
+        
         return asm;
     }
 
