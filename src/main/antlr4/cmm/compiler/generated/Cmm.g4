@@ -60,7 +60,7 @@ parameter_list
 
 
 function_body
-    : '{' statements=statementList 'return' returnValue=expression SEMICOLON '}'
+    : '{' statements=statementList returnstatement SEMICOLON '}'
     | '{' statements=statementList '}'
     ;
 
@@ -74,13 +74,13 @@ statement
 	| assign_operation SEMICOLON
 	| branch
 	| loop
-    | println
+    | returnstatement
     ;
 
-// This is a utility convention to actually output something during program execution
-println
-    : 'println(' expr=expression ')' SEMICOLON
+returnstatement
+    : 'return ' returnValue=expression
     ;
+
 
 statementList
     : statement*;
@@ -92,7 +92,7 @@ variable_declaration
     ;
 
 function_call
-    : functionName=IDENTIFIER '(' arguments=expression_list
+    : functionName=IDENTIFIER '(' arguments=expression_list ')'
     ;
 
 expression_list
