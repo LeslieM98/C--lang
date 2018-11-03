@@ -338,10 +338,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         doneL = "NotDone" + notCounter;
 
         asm.add("ifeq " + notL);
-        asm.add("ldc2_w 0");
+        asm.add("dconst_0");
         asm.add("goto " + doneL);
         asm.add(notL + ":");
-        asm.add("ldc2_w 1");
+        asm.add("dconst_1");
         asm.add(doneL + ":");
 
         return asm;
@@ -425,12 +425,13 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         String instruction = determineRelationalOperation(ctx.operator.getText());
         
-        asm.add("isub");
-        asm.add(instruction + " " + relationalDoneL);
-        asm.add("ldc2_w 0");
+        asm.add("dsub");
+        asm.add("d2i");
+        asm.add(instruction + " " + relationalL);
+        asm.add("dconst_0");
         asm.add("goto " + relationalDoneL);
         asm.add(relationalL + ":");
-        asm.add("ldc2_w 1");
+        asm.add("dconst_1");
         asm.add(relationalDoneL + ":");
 
         relationalCounter++;

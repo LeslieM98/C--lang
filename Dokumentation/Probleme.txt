@@ -30,4 +30,5 @@ Problem: Boolsche algebra, wahrheitswerte.
 	- richtige jumpreihen folge bei befeheln die nicht von JVM vorgegeben sind
 	- da wir intern mit doubles arbeiten wird es schwierig komplexe boolsche expressions 
 	  darzustellen, da die meisten mit ints arbeiten.
+--> dcmpg funktioniert wie compareTo nur mit doubles. danach zero comps verwenden
 	
