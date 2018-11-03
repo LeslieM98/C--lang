@@ -86,8 +86,11 @@ public class CodeTest{
         // write classfile to tmp file.
         String className = cf.getClassName();
         Path tmpFile = Paths.get(className + ".class");
+        OutputStream os;
         try{
-            cf.write(Files.newOutputStream(tmpFile, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE));
+            os = Files.newOutputStream(tmpFile, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
+            cf.write(os);
+            os.close();
 
             // invoke main via reflection
             URLClassLoader classLoader = new URLClassLoader(
@@ -414,11 +417,22 @@ public class CodeTest{
         String input, expected, actual;
 
         // !=
-
         input = "void main(){println(1 != 2);}";
         expected = "1.0" + System.lineSeparator();
-        actual = runCmm(input);
-        assertEquals(expected, actual);
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(2 != 2);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        // ==
+        input = "void main(){println(1 == 2);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(2 == 2);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
     }
 
     public static void main(String[] args) {
