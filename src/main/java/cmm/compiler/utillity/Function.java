@@ -22,6 +22,7 @@ public class Function{
      */
     public Function(NativeTypes returnType, String identifier, List<Pair<String, NativeTypes>> parameterList){
         setIdentifier(identifier);
+        setReturnType(returnType);
         this.parameterList = parameterList;
     }
 

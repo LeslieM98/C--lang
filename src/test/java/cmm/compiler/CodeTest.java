@@ -126,7 +126,7 @@ public class CodeTest{
         
         String asm = String.join(System.lineSeparator(), v.visit(tree));   
 
-        String output = runJasmin(source);
+        String output = runJasmin(asm);
 
         return output;
     }
@@ -407,6 +407,18 @@ public class CodeTest{
         assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 0), s.get("lb"));
         assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 0), s.get("lc"));
 
+    }
+
+    @Test
+    public void testEquality(){
+        String input, expected, actual;
+
+        // !=
+
+        input = "void main(){println(1 != 2);}";
+        expected = "1.0" + System.lineSeparator();
+        actual = runCmm(input);
+        assertEquals(expected, actual);
     }
 
     public static void main(String[] args) {

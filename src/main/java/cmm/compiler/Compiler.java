@@ -42,7 +42,11 @@ public class Compiler{
     public void compile(){
         ParseTree pt = createParser(infile).program();
         ProgramVisitor v = new ProgramVisitor();
-        List<String> asm = v.visit(pt);
+        List<String> asm = new ArrayList<>();
+        asm.add(".class public " + programname);
+        asm.add(".super java/lang/Object");
+        asm.add(System.lineSeparator());
+        asm.addAll(v.visit(pt));
         if(generateJasmin){
             writeJasmin(asm);
         } else {

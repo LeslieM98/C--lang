@@ -96,7 +96,6 @@ function_call
 
 expression_list
     : expressions+=expression (',' expressions+=expression)*
-    |
     ;
 
 assign_operation

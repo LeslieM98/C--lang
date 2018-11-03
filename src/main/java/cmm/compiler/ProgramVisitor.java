@@ -5,13 +5,14 @@ import java.nio.file.Path;
 import java.util.*;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import cmm.compiler.generated.CmmParser.*;
 import cmm.compiler.generated.*;
 import cmm.compiler.exception.*;
 import cmm.compiler.utillity.*;
 import cmm.compiler.utillity.ScopeManager.Type;
-import jas.IincInsn;
+import jas.*;
 
 public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
@@ -28,6 +29,15 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         // specific countervars for visit functions
         // eqCounter = 0;
+    }
+
+    @Override
+    public List<String> visit(ParseTree tree) {
+        List<String> asm = new ArrayList<>();
+
+
+
+        return asm;
     }
 
     private NativeTypes toNativeTypes(String in){
@@ -166,6 +176,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             params.add(new Pair<>(
                 c.variableName.getText(),
                 toNativeTypes(c.TYPE().getText())
+                
             ));
         }
 
@@ -178,32 +189,38 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         scopes.createLocalScope(f);
         scopes.switchContext(f);
 
-        // Generate Jasmin
+        // Generate Jasmin            
+
         StringBuilder methodHead = new StringBuilder()
             .append(".method ")
             .append("public ")
             .append("static ")
             .append(name)
             .append("(");
-            if(f.equals(PROGRAM_ENTRY)){
-                methodHead.append("[Ljava/lang/String;");
-            } else {
-                methodHead.append((paramcount == 0) ? "V" : "");
 
-                // Append parameters
-                for(int i = 0; i < paramcount; i++){
-                    methodHead.append("I");
-                }
+        if(f.equals(PROGRAM_ENTRY)){
+            methodHead.append("[Ljava/lang/String;");
+        } else {
+            methodHead.append((paramcount == 0) ? "V" : "");
+
+            // Append parameters
+            for(int i = 0; i < paramcount; i++){
+                methodHead.append("I");
             }
+        }
 
 
 
         methodHead.append(")")
-            .append(f.getReturnType() == NativeTypes.VOID ? "V" : "I");
+            .append((f.getReturnType() == NativeTypes.VOID) ? "V" : "I");
 
         asm.add(methodHead.toString());
+        asm.add(".limit stack 200"); // TODO: set according number
+        asm.add(".limit locals 200"); // TODO: set according number
+        asm.add("");
 
         asm.addAll(visit(ctx.function_body()));
+        asm.add("return");
 
         asm.add(".end method");
         scopes.switchToGlobalContext();
@@ -218,14 +235,15 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         if ("println".equals(functionName)) {
             asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
             String toPrint = ctx.arguments.expression.getText();
-            double value;
-            try {
-                value = Double.valueOf(toPrint);
-                asm.add("ldc " + value);
-            } catch(NumberFormatException e) {
-                Pair<Type, Integer> varToLoad = scopes.get(toPrint);
-                asm.add("iload " + varToLoad.getRight());
-            }
+            asm.addAll(visit(ctx.arguments.expression)); // rather let the parser do all work instead of doing it by hand.
+            // double value;
+            // try {
+            //     value = Double.valueOf(toPrint);
+            //     asm.add("ldc2_w " + value);
+            // } catch(NumberFormatException e) {
+            //     Pair<Type, Integer> varToLoad = scopes.get(toPrint);
+            //     asm.add("iload " + varToLoad.getRight());
+            // }
             asm.add("invokevirtual java/io/PrintStream/println(D)V");    
         }
         
@@ -240,8 +258,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     private String determineEqualityOperation(String operator){
         switch(operator){
-            case "==" : return "if_icmpeq";
-            case "!=" : return "if_icmpne";
+            case "==" : return "ifeq";
+            case "!=" : return "ifne";
             default  : return  null ;
         }
     }
@@ -266,7 +284,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         // Load right side of operation to stack
         List<String> asmRight = visit(ctx.right);
-        asm.addAll(asmRight);        
+        asm.addAll(asmRight);    
+        asm.add("dcmpg");    
 
         String trueL, doneL;
         trueL = "EqBranch" + eqCounter;
@@ -274,11 +293,11 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         String instruction = determineEqualityOperation(ctx.operator.getText());
 
-        asm.add("instruction " + trueL);
-        asm.add("ldc 0");
+        asm.add(instruction + " " + trueL);
+        asm.add("dconst_0");
         asm.add("goto " + doneL);
         asm.add(trueL + ":");
-        asm.add("ldc 1");
+        asm.add("dconst_1");
         asm.add(doneL + ":");
 
         eqCounter++;
@@ -308,10 +327,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         doneL = "NotDone" + notCounter;
 
         asm.add("ifeq " + notL);
-        asm.add("ldc0");
+        asm.add("ldc2_w 0");
         asm.add("goto " + doneL);
         asm.add(notL + ":");
-        asm.add("ldc 1");
+        asm.add("ldc2_w 1");
         asm.add(doneL + ":");
 
         return asm;
@@ -397,10 +416,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         
         asm.add("isub");
         asm.add(instruction + " " + relationalDoneL);
-        asm.add("ldc 0");
+        asm.add("ldc2_w 0");
         asm.add("goto " + relationalDoneL);
         asm.add(relationalL + ":");
-        asm.add("ldc 1");
+        asm.add("ldc2_w 1");
         asm.add(relationalDoneL + ":");
 
         relationalCounter++;
@@ -420,13 +439,13 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         if(glob != null){
             switch(glob.getLeft()){
                 case CONSTANT: 
-                    asm.add("ldc " + glob.getRight());
+                    asm.add("ldc2_w " + glob.getRight());
                     break;
             }
         } else if(loc != null){
             switch(loc.getLeft()){
                 case CONSTANT:
-                    asm.add("ldc " + loc.getRight());
+                    asm.add("ldc2_w " + loc.getRight());
                     break;
             }
 
@@ -442,6 +461,18 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
+
+    @Override
+    public List<String> visitNumber(NumberContext ctx) {
+        List<String> asm = new ArrayList<>();
+
+        double value = Double.parseDouble(ctx.number.getText());
+
+        asm.add("ldc2_w " + value);
+
+
+        return asm;
+    }
 
 
 

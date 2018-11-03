@@ -28,4 +28,6 @@ Problem: Boolsche algebra, wahrheitswerte.
 	- Wann ist ein wert true und wann false?
 -->		0 = false, !false = true;
 	- richtige jumpreihen folge bei befeheln die nicht von JVM vorgegeben sind
+	- da wir intern mit doubles arbeiten wird es schwierig komplexe boolsche expressions 
+	  darzustellen, da die meisten mit ints arbeiten.
 	
