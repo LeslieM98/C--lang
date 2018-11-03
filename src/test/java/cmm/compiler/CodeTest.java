@@ -122,7 +122,7 @@ public class CodeTest{
      */
     public static String runCmm(String source){
         ParseTree tree = createParser(source).program();
-        ProgramVisitor v = new ProgramVisitor();
+        ProgramVisitor v = new ProgramVisitor("TestAsm");
         
         String asm = String.join(System.lineSeparator(), v.visit(tree));   
 
@@ -139,7 +139,7 @@ public class CodeTest{
      */
     public static String runCmm(Path source){
         ParseTree tree = createParser(source).program();
-        ProgramVisitor v = new ProgramVisitor();
+        ProgramVisitor v = new ProgramVisitor("TestAsm");
         
         String asm = String.join(System.lineSeparator(), v.visit(tree));   
 

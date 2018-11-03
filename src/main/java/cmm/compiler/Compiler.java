@@ -28,7 +28,7 @@ public class Compiler{
         this.generateJasmin = generateJasmin;
     }
 
-    private String resolveProgramName(Path inFile){
+    public static String resolveProgramName(Path inFile){
         String file = inFile.getFileName().toString();
         int pos = file.lastIndexOf('.');
         file = file.substring(
@@ -41,12 +41,8 @@ public class Compiler{
 
     public void compile(){
         ParseTree pt = createParser(infile).program();
-        ProgramVisitor v = new ProgramVisitor();
-        List<String> asm = new ArrayList<>();
-        asm.add(".class public " + programname);
-        asm.add(".super java/lang/Object");
-        asm.add(System.lineSeparator());
-        asm.addAll(v.visit(pt));
+        ProgramVisitor v = new ProgramVisitor(programname);
+        List<String> asm = v.visit(pt);
         if(generateJasmin){
             writeJasmin(asm);
         } else {

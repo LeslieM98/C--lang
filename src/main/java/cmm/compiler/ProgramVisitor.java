@@ -16,16 +16,21 @@ import jas.*;
 
 public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
-    ScopeManager scopes;
+    private final String programName;
+    private boolean allreadyAddedClassDef;
+
+    private ScopeManager scopes;
 
     // functionIdentifiers
     private List<Function> definedFunctions;
 
 
-    public ProgramVisitor(){
+    public ProgramVisitor(String programName){
         super();
         scopes = new ScopeManager();
         definedFunctions = new ArrayList<>();
+        this.programName = programName;
+        allreadyAddedClassDef = false;
 
         // specific countervars for visit functions
         // eqCounter = 0;
@@ -35,8 +40,14 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     public List<String> visit(ParseTree tree) {
         List<String> asm = new ArrayList<>();
 
+        if(!allreadyAddedClassDef){
+            asm.add(".class public " + programName);
+            asm.add(".super java/lang/Object");
+            asm.add(System.lineSeparator());
+            allreadyAddedClassDef = true;
+        }
 
-
+        asm.addAll(super.visit(tree));
         return asm;
     }
 
