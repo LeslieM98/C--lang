@@ -492,6 +492,24 @@ public class CodeTest{
         assertEquals(expected, runCmm(input));
     }
 
+    @Test
+    public void testNot(){
+        String input, expected;
+
+        input = "void main(){println(!0);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(!1);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(!20);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+    }
+    
+
     public static void main(String[] args) {
         App a = new App();
         String[] arg = {"-j", "test.txt"};
