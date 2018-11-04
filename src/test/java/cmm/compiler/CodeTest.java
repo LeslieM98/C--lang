@@ -611,8 +611,16 @@ public class CodeTest{
         expected = "0.0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
-
-
+        input = "void main(){println(1 < 2);println(1 > 2);println(2 >= 2);println(2 < 3);println(!(2 < 3));println(1 < 2 || 1 > 2);println(2 >= 2 && (!(2 < 3)));println((1 < 2 || 1 > 2) && (2 >= 2 && (!(2 < 3))));}";
+        expected = "1.0" + System.lineSeparator() + 
+        "0.0" + System.lineSeparator() + 
+        "1.0" + System.lineSeparator() + 
+        "1.0" + System.lineSeparator() + 
+        "0.0" + System.lineSeparator() + 
+        "1.0" + System.lineSeparator() + 
+        "0.0" + System.lineSeparator() + 
+        "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
     }
 
     public static void main(String[] args) {
