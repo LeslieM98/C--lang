@@ -257,7 +257,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             // }
             asm.add("invokevirtual java/io/PrintStream/println(D)V");    
         }
-        
+        asm.add(System.lineSeparator());
         return asm;
     }
 
@@ -301,6 +301,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String trueL, doneL;
         trueL = "EqBranch" + eqCounter;
         doneL = "EqualFinish" + eqCounter;
+        eqCounter++;
 
         String instruction = determineEqualityOperation(ctx.operator.getText());
 
@@ -311,10 +312,11 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.add("dconst_1");
         asm.add(doneL + ":");
 
-        eqCounter++;
 
         return asm;
     }
+
+
 
 
     /**
@@ -336,6 +338,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String notL, doneL;
         notL = "NotBranch" + notCounter;
         doneL = "NotDone" + notCounter;
+        notCounter++;
 
         asm.add("dconst_0");
         asm.add("dcmpg");
@@ -346,44 +349,59 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.add("dconst_1");
         asm.add(doneL + ":");
 
-        return asm;
-    }
-
-    /**
-     * Performs the bitwise AND operation.<br>
-     * 
-     * Assuming both operands are on top the stack. 
-     * Performs a standard AND operation between 2 values. 
-     * Works for boolean logic and integer logic.
-     */
-    @Override
-    public List<String> visitAnd(AndContext ctx) {
-
-        // Load left side of operation to stack
-        List<String> asm = visit(ctx.left);
-
-        // Load right side of operation to stack
-        asm.addAll(visit(ctx.right));
-
-        asm.add("iand");
 
         return asm;
     }
 
+
+
+
+
+     /**
+     * Used to transform a conjunction operator to a JVM instruction. 
+     * Can only transform && , ||.
+     * @param operator A conjunctio operator mentiioned above.
+     * @return A corresponding JVM instruction.
+     */
+    private String determineConjunctionOperation(String operator){
+        switch(operator){
+            case "&&" : return "iand";
+            case "||" : return "ior";
+            default  : return  null ;
+        }
+    }
+
+    /** Used to identify jumplabels in the conjunction operation. */
+    private int conjunctionCounter;
     /**
-     * Performs the bitwise OR operation.<br>
-     * 
-     * Assuming both operands are on top the stack. 
-     * Performs a standard OR operation between 2 values. 
-     * Works for boolean logic and integer logic.
+     * Treats both operands as boolean values meaning 0 = false and non 0 = true
+     * performs a basic AND or OR operation pushing either a 0.0 or 1.0 double on the stack
      */
     @Override
-    public List<String> visitOr(OrContext ctx) {
+    public List<String> visitConjunction(ConjunctionContext ctx) {
+        String branchL, doneL;
+        branchL = "ConjBranch" + conjunctionCounter;
+        doneL   = "ConjDone"   + conjunctionCounter;
+
+        conjunctionCounter++;
+
+        String instruction = determineConjunctionOperation(ctx.operator.getText());
 
         List<String> asm = visit(ctx.left);
-        asm.addAll(visit(ctx.right));
+        asm.add("dconst_0");
+        asm.add("dcmpg");   // compare left with 0
 
-        asm.add("ior");
+        asm.addAll(visit(ctx.right));
+        asm.add("dconst_0");
+        asm.add("dcmpg");   // compare right with 0
+
+        asm.add(instruction);
+        asm.add("ifne " + branchL);
+        asm.add("dconst_0");
+        asm.add("goto " + doneL);
+        asm.add(branchL + ":");
+        asm.add("dconst_1");
+        asm.add(doneL + ":");
 
         return asm;
     }
@@ -425,18 +443,17 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         relationalL = "relBranch" + relationalCounter;
         relationalDoneL = "relDone" + relationalCounter;
 
+        relationalCounter++;
+
         String instruction = determineRelationalOperation(ctx.operator.getText());
         
-        asm.add("dsub");
-        asm.add("d2i");
+        asm.add("dcmpg");
         asm.add(instruction + " " + relationalL);
         asm.add("dconst_0");
         asm.add("goto " + relationalDoneL);
         asm.add(relationalL + ":");
         asm.add("dconst_1");
         asm.add(relationalDoneL + ":");
-
-        relationalCounter++;
 
         return asm;
     }
@@ -453,13 +470,13 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         if(glob != null){
             switch(glob.getLeft()){
                 case CONSTANT: 
-                    asm.add("ldc2_w " + glob.getRight());
+                    asm.add("ldc2_w " + Double.parseDouble(glob.getRight()));
                     break;
             }
         } else if(loc != null){
             switch(loc.getLeft()){
                 case CONSTANT:
-                    asm.add("ldc2_w " + loc.getRight());
+                    asm.add("ldc2_w " + (double) loc.getRight());
                     break;
             }
 

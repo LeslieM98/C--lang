@@ -507,8 +507,113 @@ public class CodeTest{
         input = "void main(){println(!20);}";
         expected = "0.0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
+
+
     }
     
+
+    @Test
+    public void testAndOr(){
+        String input, expected;
+        
+        // &&
+        input = "void main(){println(1 && 1);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(1 && 0);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(0 && 0);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(0 && 1);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(-100 && 100);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(-100 && 0);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(100 && 0);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+
+        input = "void main(){println(1 && 0 && 1);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(1 && 1 && 1);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(0 && 0 && 0);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        // ||
+        input = "void main(){println(1 || 1);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(1 || 0);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(0 || 0);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(0 || 1);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(-100 || 100);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(-100 || 0);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(100 || 0);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+
+
+        input = "void main(){println(1 || 0 || 1);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(1 || 1 || 1);}";
+        expected = "1.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "void main(){println(0 || 0 || 0);}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+    }
+
+    @Test
+    public void testBooleanExpression(){
+        String input, expected;
+
+
+        input = "void main(){println((1 < 2 || 1 > 2) && (2 >= 2 && (!(2 < 3))));}";
+        expected = "0.0" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+
+
+    }
 
     public static void main(String[] args) {
         App a = new App();

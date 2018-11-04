@@ -23,6 +23,7 @@ src/main/antlr4/cmm/compiler/.antlr
 
 # compiled code
 *.class
+*.jar
 
 # TestMain
 src/main/java/cmm/compiler/TestApp.java
