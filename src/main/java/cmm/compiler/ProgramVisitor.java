@@ -261,8 +261,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             .append((f.getReturnType() == NativeTypes.VOID) ? "V" : "I");
 
         asm.add(methodHead.toString());
-        asm.add(".limit stack " + (functionBody.size())); // TODO: set according number
-        asm.add(".limit locals " + localVarCount(functionBody)); // TODO: set according number
+        asm.add(".limit stack " + (functionBody.size()));
+        asm.add(".limit locals " + localVarCount(functionBody));
         asm.add("");
 
         asm.addAll(functionBody);
