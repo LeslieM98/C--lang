@@ -138,6 +138,41 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
 
+    private int localVarCount(List<String> asm){
+        int num;
+        int max = 0;
+        int pos;
+        String tmp;
+
+        for (String x : asm) {
+            if(x.contains("dstore")){
+                tmp = x.trim()
+                    .replaceAll("dstore", "")
+                    .trim();
+
+                pos = tmp.indexOf(' ');
+                tmp = tmp.substring(0, pos);
+                num = Integer.parseInt(tmp.trim());
+                Math.max(max, num);
+            }
+
+            if(x.contains("dload")){
+                tmp = x.trim()
+                    .replaceAll("dload", "")
+                    .trim();
+
+                pos = tmp.indexOf(' ');
+                tmp = tmp.substring(0, pos);
+                num = Integer.parseInt(tmp.trim());
+                Math.max(max, num);
+            }
+        }
+
+
+
+        return max;
+    }
+
 
     private static final Function PROGRAM_ENTRY = new Function(NativeTypes.VOID, "main");
     /**
@@ -220,17 +255,17 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             }
         }
 
-
+        List<String> functionBody = visit(ctx.function_body());
 
         methodHead.append(")")
             .append((f.getReturnType() == NativeTypes.VOID) ? "V" : "I");
 
         asm.add(methodHead.toString());
-        asm.add(".limit stack 200"); // TODO: set according number
-        asm.add(".limit locals 200"); // TODO: set according number
+        asm.add(".limit stack " + (functionBody.size())); // TODO: set according number
+        asm.add(".limit locals " + localVarCount(functionBody)); // TODO: set according number
         asm.add("");
 
-        asm.addAll(visit(ctx.function_body()));
+        asm.addAll(functionBody);
         asm.add("return");
 
         asm.add(".end method");
