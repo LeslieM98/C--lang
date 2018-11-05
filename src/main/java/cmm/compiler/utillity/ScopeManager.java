@@ -27,13 +27,13 @@ public class ScopeManager {
     private Map<String, String> globalConstants;
     private Map<String, String> globalVariables;
 
-    private Map<String, Integer> currentConstants;    // Acts as pointer
+    private Map<String, String> currentConstants;    // Acts as pointer
     private Map<String, Integer> currentVariables;    // Acts as plointer
 
-    private List<Map<String, Integer>> temporaryConstants;
+    private List<Map<String, String>> temporaryConstants;
     private List<Map<String, Integer>> temporaryVariables;
 
-    private Map<Function, Map<String, Integer>> localConstantScopes;
+    private Map<Function, Map<String, String>> localConstantScopes;
     private Map<Function, Map<String, Integer>> localVariableScopes;
 
 
@@ -55,167 +55,77 @@ public class ScopeManager {
         localConstantScopes = new HashMap<>();
     }
 
-    
-    /**
-     * Checks if given variable/constant is usable in the current Scope.
-     * Returns the {@link Type} of the identifier or null.
-     * @param identifier The name of the variable/constant.
-     * @return the type or null if not accessible.
-     */
-    // TODO: looks ugly
-    public Type accessible(String identifier){
-        Type ret;
 
-        ret = globalConstants.get(identifier) == null ? Type.CONSTANT : null;
-        if(ret != null) return ret;
+    public Identifier get(String name){
+        String value;
 
-        ret = globalVariables.get(identifier) == null ? Type.VARIABLE : null;
-        if(ret != null) return ret;
-
-        if(currentConstants != null){
-            ret = currentConstants.get(identifier) == null ? Type.CONSTANT : null;
-            if(ret != null) return ret;
+        value = globalConstants.get(name);
+        if(value != null){
+            return new Identifier(Scope.GLOBAL, Type.CONSTANT, name, value);
         }
 
-        if(currentVariables != null){
-            ret = currentVariables.get(identifier) == null ? Type.VARIABLE : null;
-            if(ret != null) return ret;
+        value = globalVariables.get(name);
+        if(value != null){
+            return new Identifier(Scope.GLOBAL, Type.VARIABLE, name, value);
         }
 
-        for(Map<String, Integer> i : temporaryConstants){
-            ret = i.containsKey(identifier) ? Type.CONSTANT : null;
-            if(ret != null) break;
-        }
-        if(ret != null) return ret;
-
-        for(Map<String, Integer> i : temporaryVariables){
-            ret = i.containsKey(identifier) ? Type.VARIABLE : null;
-            if(ret != null) break;
-        }
-        return ret;
-    }
-
-    /**
-     * Returns a Pair of &lt;{@link Type}, Integer&gt; containing information about the identifier.
-     * Checks if the given identifier is accessible from the current scope.
-     * Returns null if not accessible.
-     * This method accounts for Local and Temporary scopes.
-     * @param identifier The identifier of either a Var or Const.
-     * @return Information about given identifier, or null if not accessible.
-     */
-    public Pair<Type, Integer> get(String identifier){
-        Pair<Type, Integer> ret = null;
-
-        ret = getLocal(identifier);
-        if(ret != null) return ret;
-
-        ret = getTemporary(identifier);
-        return ret;
-    }
-
-    /**
-     * Returns a Pair of &lt;{@link Type}, String&gt; containing information about the identifier.
-     * Checks if the given identifier is accessible from the current Scope
-     * Returns null if not accessible.
-     * This method only accounts for global scopes.
-     * @param identifier The identifier of either a Var or Const.
-     * @return Information about given identifier, or null if not accessible.
-     */
-    public Pair<Type, String> getGlobal(String identifier){
-
-        String tmp = globalConstants.get(identifier);
-
-        if(tmp != null){
-            return new Pair<>(Type.CONSTANT, tmp);
+        value = currentConstants.get(name);
+        if(value != null){
+            return new Identifier(Scope.LOCAL, Type.CONSTANT, name, value);
         }
 
-        tmp = globalVariables.get(identifier);
-        if(tmp != null){
-            return new Pair<>(Type.VARIABLE, tmp);
+        value = Integer.toString(currentVariables.get(name));
+        if(value != null){
+            return new Identifier(Scope.LOCAL, Type.VARIABLE, name, value);
         }
+
+
+        for (Map<String, String> x : temporaryConstants) {
+            value = x.get(name);
+            if(value != null){
+                return new Identifier(Scope.TEMPORARY, Type.CONSTANT, name, value);
+            }
+        }
+
+        for(Map<String, Integer> x : temporaryVariables){
+            value = Integer.toString(x.get(name));
+            if(value !=  null){
+                return new Identifier(Scope.TEMPORARY, Type.VARIABLE, name, value);
+            }
+        }
+
 
         return null;
+
     }
 
-    /**
-     * Returns a Pair of &lt;{@link Type}, Integer&gt; containing information about the identifier.
-     * Checks if the given identifier is accessible from the current Scope
-     * Returns null if not accessible.
-     * This method only accounts for local scopes.
-     * @param identifier The identifier or either a var or const.
-     * @return Information about given identifier or null if not accessible.
-     */
-    private Pair<Type, Integer> getLocal(String identifier){
-
-        Integer tmp = null;
-        if(currentConstants != null){
-            tmp = currentConstants.get(identifier);
+    public boolean createLocalScope(Function f){
+        if(localConstantScopes.containsKey(f) || localVariableScopes.containsKey(f)){
+            return false;
         }
 
-        if(tmp != null){
-            return new Pair<>(Type.CONSTANT, tmp);
-        }
-        if(currentVariables != null){
-            tmp = currentVariables.get(identifier);
-        }
-        if(tmp != null){
-            return new Pair<>(Type.VARIABLE, tmp);
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns a Pair of &lt;{@link Type}, Integer&gt; containing information about the identifier.
-     * Checks if the given identifier is accessible from the current Scope
-     * Returns null if not accessible.
-     * This method only accounts for temporary scopes.
-     * @param identifier The identifier or either a var or const.
-     * @return Information about given identifier or null if not accessible.
-     */
-    private Pair<Type, Integer> getTemporary(String identifier){
-        Integer tmp;
-
-        for(Map<String, Integer> i : temporaryConstants){
-            tmp = i.get(identifier);
-            if(tmp != null) return new Pair<>(Type.CONSTANT, tmp);
-        }
-
-        for(Map<String, Integer> i : temporaryVariables){
-            tmp = i.get(identifier);
-            if(tmp != null) return new Pair<>(Type.VARIABLE, tmp);
-        }
-
-        return null;
-    }
-
-    /**
-     * Sets the current Scope to a local scope.
-     * Tries to set the current Scope to a different local scope.
-     * Returns false if it's not possible to swich the context. 
-     * The changes will be undone.
-     * Also clears temporary scopes.
-     * @param scopeIdentifier An identifier that represents the scope.
-     * @return true if sucessfully switched, false if not.
-     */
-    public boolean switchContext(Function scopeIdentifier){
-        Map<String, Integer> tmpConst = localConstantScopes.get(scopeIdentifier);
-        Map<String, Integer> tmpVar   = localVariableScopes.get(scopeIdentifier);
-
-        if(tmpConst == null || tmpVar == null) return false;
-
-        currentConstants = tmpConst;
-        currentVariables = tmpVar;
-
-        temporaryConstants = new ArrayList<>();
-        temporaryVariables = new ArrayList<>();
-        
+        localConstantScopes.putIfAbsent(f, new HashMap<>());
+        localVariableScopes.putIfAbsent(f, new HashMap<>());
         return true;
     }
 
-    /**
-     * Deletes every temporary scope and sets the scope to a global scope.
-     */
+    public boolean switchContext(Function f){
+        if(f == null) {
+            switchToGlobalContext();
+            return true;
+        }
+        if(localConstantScopes.containsKey(f) || localVariableScopes.containsKey(f)){
+            return false;
+        }
+
+        currentConstants = localConstantScopes.get(f);
+        currentVariables = localVariableScopes.get(f);
+
+        resetTemporary();
+
+        return true;
+    }
+
     public void switchToGlobalContext(){
         currentConstants = null;
         currentVariables = null;
@@ -224,167 +134,128 @@ public class ScopeManager {
         temporaryVariables = null;
     }
 
-    /**
-     * Creates a new lookuptable for a local scope.
-     * Returns true if succesfully created or false if 
-     * a scope with the same name allready exists.
-     * @param scopeIdentifier A string that identifies the new scope.
-     * @return True if succesfully created, false if otherwise.
-     */
-    public boolean createLocalScope(Function scopeIdentifier){
-        if(localConstantScopes.containsKey(scopeIdentifier) || localVariableScopes.containsKey(scopeIdentifier)){
-            return false;
-        }
-        localConstantScopes.put(scopeIdentifier, new HashMap<>());
-        localVariableScopes.put(scopeIdentifier, new HashMap<>());
-
-        return true;
+    private void resetTemporary(){
+        temporaryConstants = null;
+        temporaryVariables = null;
     }
 
-    /**
-     * Creates a new temporary scope and steps into it.
-     */
-    public void enterTempScope(){
+    public int currentTemporaryScopeDepth(){
+        if(temporaryConstants == null) return 0;
+        return temporaryConstants.size();
+    }
+
+    private boolean enterTemporaryScope(){
+        if(temporaryConstants == null || temporaryVariables == null){
+            temporaryConstants = new ArrayList<>();
+            temporaryVariables = new ArrayList<>();
+        }
         temporaryConstants.add(new HashMap<>());
         temporaryVariables.add(new HashMap<>());
-    }
-
-
-    /**
-     * Calculates the depth of temporary scopes.
-     * 0 meaning currently in a local or global scope.
-     * @return Depth of the temporary scopes.
-     */
-    public int currentTempScopeDepth(){
-        return (temporaryConstants == null) ? 0 : temporaryConstants.size();
-    }
-
-    /**
-     * Leaves the deepest current temporary scope and deletes it.
-     */
-    public void leaveTempScope(){
-        temporaryConstants.remove(temporaryConstants.size()-1);
-        temporaryVariables.remove(temporaryVariables.size()-1);
-    }
-
-
-    /**
-     * Adds a a constant to the deepest current temporary scope.
-     * This identifier is only usable in there and deeper scopes.
-     * @param val The value of the constant.
-     * @param identifier The identifier of the constant.
-     * @return True if the constant was added successfully, false if not. 
-     *         f.e. when a different constant allready exists with the same name.
-     */
-    public boolean addTemporaryConstant(String identifier, int val){
-        if(get(identifier) != null) return false;
-
-        temporaryConstants.get(temporaryVariables.size()-1)
-            .put(identifier, val);
-
         return true;
     }
 
-    /**
-     * Adds a constant to the local scope.
-     * Inserts a value with the given identifier to the current local scope.
-     * Also checks if the identifier was defined already in the current scope.
-     * @param identifier A string to identifiy the constant.
-     * @param val The value of the set constant.
-     * @return true if sucessfully added, false if otherwise.
-     */
-    public boolean addLocalConstant(String identifier, int val){
-        if(get(identifier) != null) return false;
-        if(getGlobal(identifier) != null) return false;
-
-        currentConstants.put(identifier, val);
-        return true;
-    }
-
-    /**
-     * Adds a constant to the global scope.
-     * Inserts a value with the given identifier to the global scope.
-     * Also checks if the identifier was defined already in the current scope.
-     * @param identifier A string to identifiy the constant.
-     * @param val The value of the set constant.
-     * @return true if sucessfully added, false if otherwise.
-     */
-    public boolean addGlobalConstant(String identifier, String val){
-        if(get(identifier) != null) return false;
-
-        globalConstants.put(identifier, val);
-        return true;
-    }
-
-
-
-    /**
-     * Adds a variable to the current local scope.
-     * Also finds the next free spot in the locals array.
-     * Returns either a new spot or the old spot if the 
-     * variable allready exists.
-     * This function returns a negative value if it's somehow 
-     * not possible to create a new local variable f.e. another 
-     * variable with the same identifier is allready existing.
-     * @param identifier The name of the variable.
-     * @return The fixed spot in the locals array. Or negative val if no spot is available.
-     */
-    public int addLocalVariable(String identifier){
-        int r = 0;
-
-        if(get(identifier) != null) return -1;
-        if(getGlobal(identifier) != null) return -2;
-
-        while(currentVariables.containsValue(r)){
-            r++;
+    private void leaveTemporaryScope(){
+        if(currentTemporaryScopeDepth() == 1){
+            resetTemporary();
         }
-
-        currentVariables.put(identifier, r);
-        return r;
+        if(currentTemporaryScopeDepth() != 0){
+            temporaryConstants.remove(temporaryConstants.size() - 1);
+            temporaryVariables.remove(temporaryVariables.size() - 1);
+        }
     }
 
-    /**
-     * Adds a variable to the current deepest temporary scope.
-     * Also dynamically finds the next free spot in the locals array.
-     * This returned integer can change depending on how 
-     * other local variables are stored.
-     * The new variable is stored in an 
-     * efficient manner inside the locals array.
-     * This function returns a negative value if another variable
-     * exists with the same name or if it is somehow not possible 
-     * to assign a local spot to the variabls
-     * @param identifier the name of the variable.
-     * @return The dynamic spot in the locals array.
-     */
-    public int addTemporaryVariable(String identifier){
-        int r = 0;
+    
+    public boolean putVar(String name){
+        switch (currentScope()) {
+            case GLOBAL:
+                return putGlobVar(name);
+            case LOCAL:
+                return putLocalVar(name);
+            case TEMPORARY:
+                return putTemporaryVar(name);
+            default:
+                return false;
+        }
+    }
+
+    private boolean putGlobVar(String name){
+        if(get(name) != null) return false;
+        return globalVariables.putIfAbsent(name, name) != null;
+    }
+
+    private boolean putLocalVar(String name){
+        if(currentVariables == null) return false;
+        if(get(name) != null) return false;
+
+        for (int i = 0; i < Integer.MAX_VALUE - 1; i++) {
+            if(!currentVariables.containsValue(i)){
+                currentVariables.put(name, i);  
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean putTemporaryVar(String name){
+        if(get(name) != null) return false;
+        if(temporaryVariables.size() == 0) return false;
+
         boolean b;
 
-        if(get(identifier) != null) return -1;
-        if(getGlobal(identifier) != null) return 2;
-
-        while(true){
-            b = false;
-            for(int i = 0; i < temporaryVariables.size(); i++){
-                b &= temporaryVariables.get(i).containsValue(r);
+        for (int i = 0; i < Integer.MAX_VALUE - 1; i++) {
+            Map<String, Integer> tmp;
+            b = !currentVariables.containsValue(i);
+            if(b == false) continue;
+            for (Map<String, Integer> x : temporaryVariables) {
+                b &= !x.containsValue(i);
+                if(b == false) break;
             }
-
-            if (!b) break;
-
-            r++;
+            if(b == true){
+                tmp = temporaryVariables.get(temporaryVariables.size() - 1);
+                tmp.put(name, i);
+                return true;
+            }
         }
-
-        return r;
+        return false;
     }
 
-    /**
-     * Determines wether the current scope is a local or global scope.
-     * True meaning current scope is in either a local or temporary scope.
-     * @return true if inside of a local scope false if inside a global scope.
-     */
-    public boolean inLocalScope(){
-        return (currentConstants != null);
+
+    public boolean putConstant(String name, String value){
+        return false;
     }
+
+    public boolean putGlobConst(String name, String value){
+        if(get(name) != null) return false;
+        return globalConstants.putIfAbsent(name, value) == null;
+    }
+
+    public boolean putLocalConst(String name, String value){
+        if(get(name) != null) return false;
+        if(currentConstants == null) return false;
+
+        return currentConstants.putIfAbsent(name, value) != null;
+    }
+
+    public boolean putTemporaryConst(String name, String value){
+        if(get(name) != null) return false;
+        if(temporaryConstants.size() == 0) return false;
+
+        Map<String, String> tmp = temporaryConstants.get(temporaryConstants.size() - 1);
+        
+        return tmp.putIfAbsent(name, value) == null;
+    }
+
+    public Scope currentScope(){
+        if(currentConstants == null){
+            return Scope.GLOBAL;
+        }
+        if(currentConstants != null && temporaryConstants == null;){
+            return Scope.LOCAL;
+        }
+        return Scope.TEMPORARY;
+    }
+
+
 
     /**
      * Used as reference to what was returned. And how to interpret the result.<br>
@@ -397,4 +268,83 @@ public class ScopeManager {
         VARIABLE,
         CONSTANT;
     }
+
+    public static enum Scope{
+        GLOBAL,
+        LOCAL,
+        TEMPORARY;
+    }
+
+    public static class Identifier{
+        private final Scope scope;
+        private final Type type;
+        private final String name;
+        private final String value;
+    
+        private Identifier(Scope scope, Type type, String name, String value){
+            if(scope == null || type == null || name == null || value == null){
+                throw new IllegalStateException("Cannot assign nullvalue");
+            }
+            this.scope = scope;
+            this.type = type;
+            this.name = name;
+            this.value = value;
+        }
+    
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+    
+        /**
+         * @return the scope
+         */
+        public Scope getScope() {
+            return scope;
+        }
+    
+        /**
+         * @return the type
+         */
+        public Type getType() {
+            return type;
+        }
+
+        /**
+         * @return the value
+         */
+        public String getValue() {
+            return value;
+        }
+    
+    
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder()
+                .append(scope.toString()).append(":")
+                .append(type.toString()).append(":")
+                .append(name);
+    
+            return sb.toString();
+        }
+    
+        @Override
+        public boolean equals(Object obj) {
+            if (obj != null && getClass() == obj.getClass()) {
+                Identifier o = (Identifier)obj;
+                boolean b;
+                b  = o.getName().equals(name);
+                b &= o.getScope() == scope;
+                b &= o.getType() == type;
+                b &= o.getValue() == value;
+                
+                return b;
+            }
+        return false;
+        }
+    
+    
+    } 
 }
