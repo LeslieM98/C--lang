@@ -69,28 +69,40 @@ public class ScopeManager {
             return new Identifier(Scope.GLOBAL, Type.VARIABLE, name, value);
         }
 
-        value = currentConstants.get(name);
+        if(currentConstants != null){
+            value = currentConstants.get(name);
+        }
         if(value != null){
             return new Identifier(Scope.LOCAL, Type.CONSTANT, name, value);
         }
 
-        value = Integer.toString(currentVariables.get(name));
+        if(currentVariables != null){
+            if(currentVariables.containsKey(name)){
+                value = Integer.toString(currentVariables.get(name));
+            }
+        }
         if(value != null){
             return new Identifier(Scope.LOCAL, Type.VARIABLE, name, value);
         }
 
 
-        for (Map<String, String> x : temporaryConstants) {
-            value = x.get(name);
-            if(value != null){
-                return new Identifier(Scope.TEMPORARY, Type.CONSTANT, name, value);
+        if(temporaryConstants != null){
+            for (Map<String, String> x : temporaryConstants) {
+                value = x.get(name);
+                if(value != null){
+                    return new Identifier(Scope.TEMPORARY, Type.CONSTANT, name, value);
+                }
             }
         }
 
-        for(Map<String, Integer> x : temporaryVariables){
-            value = Integer.toString(x.get(name));
-            if(value !=  null){
-                return new Identifier(Scope.TEMPORARY, Type.VARIABLE, name, value);
+        if(temporaryVariables != null){
+            for(Map<String, Integer> x : temporaryVariables){
+                if(x.containsKey(name)){
+                    value = Integer.toString(x.get(name));
+                    if(value !=  null){
+                        return new Identifier(Scope.TEMPORARY, Type.VARIABLE, name, value);
+                    }
+                }
             }
         }
 
@@ -114,7 +126,7 @@ public class ScopeManager {
             switchToGlobalContext();
             return true;
         }
-        if(localConstantScopes.containsKey(f) || localVariableScopes.containsKey(f)){
+        if(!localConstantScopes.containsKey(f) || !localVariableScopes.containsKey(f)){
             return false;
         }
 
@@ -144,7 +156,7 @@ public class ScopeManager {
         return temporaryConstants.size();
     }
 
-    private boolean enterTemporaryScope(){
+    public boolean enterTemporaryScope(){
         if(temporaryConstants == null || temporaryVariables == null){
             temporaryConstants = new ArrayList<>();
             temporaryVariables = new ArrayList<>();
@@ -154,7 +166,7 @@ public class ScopeManager {
         return true;
     }
 
-    private void leaveTemporaryScope(){
+    public void leaveTemporaryScope(){
         if(currentTemporaryScopeDepth() == 1){
             resetTemporary();
         }
@@ -221,7 +233,16 @@ public class ScopeManager {
 
 
     public boolean putConstant(String name, String value){
-        return false;
+        switch (currentScope()) {
+            case GLOBAL:
+                return putGlobConst(name, value);
+            case LOCAL :
+                return putLocalConst(name, value);
+            case TEMPORARY :
+                return putTemporaryConst(name, value);
+            default:
+                return false;
+        }
     }
 
     private boolean putGlobConst(String name, String value){

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.*;
 import cmm.compiler.exception.*;
 import cmm.compiler.generated.*;
 import cmm.compiler.utillity.*;
-import cmm.compiler.utillity.ScopeManager.Type;
+import cmm.compiler.utillity.ScopeManager.*;
 import jas.jasError;
 import jasmin.ClassFile;
 
@@ -241,174 +241,175 @@ public class CodeTest{
 
     @Test
     public void testScopeManager(){
-        // ScopeManager s = new ScopeManager();
+        ScopeManager s = new ScopeManager();
 
-        // /*
-        //  * CONSTANTS
-        //  */
+        /*
+         * CONSTANTS
+         */
 
-        // /* Test if global constants return correct value */
-        // s.addGlobalConstant("a", "1");
-        // s.addGlobalConstant("b", "2");
-        // s.addGlobalConstant("c", "3");
+        /* Test if global constants return correct value */
 
-        // assertNull(s.get("a"));
-        // assertNull(s.get("b"));
-        // assertNull(s.get("c"));
+        assertNull(s.get("a"));
+        assertNull(s.get("b"));
+        assertNull(s.get("c"));
 
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "1"), s.getGlobal("a"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "2"), s.getGlobal("b"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "3"), s.getGlobal("c"));
+        s.putConstant("a", "1");
+        s.putConstant("b", "2");
+        s.putConstant("c", "3");
 
-
-        // /* Test if local constants returns correct values. */
-        // Function f1 = new Function(NativeTypes.VOID, "foo", new Pair<>("a", NativeTypes.NUM));
-        // s.createLocalScope(f1);
-        // s.switchContext(f1);
-        // s.inLocalScope();
-        // assertEquals(s.currentTempScopeDepth(), 0);
-
-        // s.addLocalConstant("la", 4);
-        // s.addLocalConstant("lb", 5);
-        // s.addLocalConstant("lc", 6);
-
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 4), s.get("la"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 5), s.get("lb"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 6), s.get("lc"));
-
-        // // Test wether global constants still work in local context.
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "1"), s.getGlobal("a"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "2"), s.getGlobal("b"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "3"), s.getGlobal("c"));
+        assertEquals("1", s.get("a").getValue());
+        assertEquals("2", s.get("b").getValue());
+        assertEquals("3", s.get("c").getValue());
 
 
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "1"), s.getGlobal("a"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "2"), s.getGlobal("b"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "3"), s.getGlobal("c"));
+        /* Test if local constants returns correct values. */
+        Function f1 = new Function(NativeTypes.VOID, "foo", new Pair<>("a", NativeTypes.NUM));
+        s.createLocalScope(f1);
+        s.switchContext(f1);
+        assertEquals(Scope.LOCAL, s.currentScope());
+        assertEquals(s.currentTemporaryScopeDepth(), 0);
 
-        // // Cannot declare local constant twice
-        // assertFalse(s.addLocalConstant("la", 99));
-        // assertFalse(s.addLocalConstant("lb", 99));
-        // assertFalse(s.addLocalConstant("lc", 99));
+        s.putConstant("la", "4");
+        s.putConstant("lb", "5");
+        s.putConstant("lc", "6");
 
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 4), s.get("la"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 5), s.get("lb"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 6), s.get("lc"));
+        assertEquals("4", s.get("la").getValue());
+        assertEquals("5", s.get("lb").getValue());
+        assertEquals("6", s.get("lc").getValue());
 
-        // // Cannot declare local constant when a global constant with same identifier exists
-        // assertFalse(s.addLocalConstant("a", 1));
-        // assertFalse(s.addLocalConstant("b", 2));
-        // assertFalse(s.addLocalConstant("c", 3));
-
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "1"), s.getGlobal("a"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "2"), s.getGlobal("b"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "3"), s.getGlobal("c"));
-
-        // /* Test temporary entering temporary scope */
-        // s.enterTempScope();
-        // assertEquals(s.currentTempScopeDepth(), 1);
-        // assertTrue(s.inLocalScope());
-
-        // s.addTemporaryConstant("at", 7);
-        // s.addTemporaryConstant("bt", 8);
-        // s.addTemporaryConstant("ct", 9);
-
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 7), s.get("at"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 8), s.get("bt"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 9), s.get("ct"));
+        // Test wether global constants still work in local context.
+        assertEquals("1", s.get("a").getValue());
+        assertEquals("2", s.get("b").getValue());
+        assertEquals("3", s.get("c").getValue());
 
 
-        // // Test wether global constants still work in temporary context.
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "1"), s.getGlobal("a"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "2"), s.getGlobal("b"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "3"), s.getGlobal("c"));
+        assertEquals("1", s.get("a").getValue());
+        assertEquals("2", s.get("b").getValue());
+        assertEquals("3", s.get("c").getValue());
 
-        // // Test wether local constants still work in temporary context.
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 4), s.get("la"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 5), s.get("lb"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 6), s.get("lc"));
+        // Cannot declare local constant twice
+        assertFalse(s.putConstant("la", "99"));
+        assertFalse(s.putConstant("lb", "99"));
+        assertFalse(s.putConstant("lc", "99"));
 
+        assertEquals("4", s.get("la").getValue());
+        assertEquals("5", s.get("lb").getValue());
+        assertEquals("6", s.get("lc").getValue());
 
-        // /* Test temporary scope at depth 2 */
-        // s.enterTempScope();
-        // assertTrue(s.inLocalScope());
-        // assertEquals(s.currentTempScopeDepth(), 2);
+        // Cannot declare local constant when a global constant with same identifier exists
+        assertFalse(s.putConstant("a", "1"));
+        assertFalse(s.putConstant("b", "2"));
+        assertFalse(s.putConstant("c", "3"));
 
-        // s.addTemporaryConstant("att", 10);
-        // s.addTemporaryConstant("btt", 11);
-        // s.addTemporaryConstant("ctt", 12);
+        assertEquals("1", s.get("a").getValue());
+        assertEquals("2", s.get("b").getValue());
+        assertEquals("3", s.get("c").getValue());
 
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 10), s.get("att"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 11), s.get("btt"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 12), s.get("ctt"));
+        /* Test temporary entering temporary scope */
+        s.enterTemporaryScope();
+        assertEquals(s.currentTemporaryScopeDepth(), 1);
+        assertEquals(Scope.TEMPORARY, s.currentScope());
 
-        // // Test wether constants at depth 1 still work
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 7), s.get("at"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 8), s.get("bt"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 9), s.get("ct"));
+        
+        s.putConstant("at", "7");
+        s.putConstant("bt", "8");
+        s.putConstant("ct", "9");
 
-        // // Test wether global constants still work in temporary context.
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "1"), s.getGlobal("a"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "2"), s.getGlobal("b"));
-        // assertEquals(new Pair<Type, String>(Type.CONSTANT, "3"), s.getGlobal("c"));
-
-        // // Test wether local constants still work in temporary context.
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 4), s.get("la"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 5), s.get("lb"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 6), s.get("lc"));
-
-        // /* Test leaving scope at depth 2*/
-        // s.leaveTempScope();
-        // assertTrue(s.inLocalScope());
-        // assertEquals(s.currentTempScopeDepth(), 1);
-
-        // // Depth 2 not accessible anymore
-        // assertNull(s.get("att"));
-        // assertNull(s.get("btt"));
-        // assertNull(s.get("ctt"));
-
-        // // Depth 1 still accessible
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 7), s.get("at"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 8), s.get("bt"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 9), s.get("ct"));
+        assertEquals("7", s.get("at").getValue());
+        assertEquals("8", s.get("bt").getValue());
+        assertEquals("9", s.get("ct").getValue());
 
 
-        // /* Reentering depth 2 does not use the same variables */
-        // s.enterTempScope();
-        // assertEquals(2, s.currentTempScopeDepth());
+        // Test wether global constants still work in temporary context.
+        assertEquals("1", s.get("a").getValue());
+        assertEquals("2", s.get("b").getValue());
+        assertEquals("3", s.get("c").getValue());
 
-        // assertNull(s.get("att"));
-        // assertNull(s.get("btt"));
-        // assertNull(s.get("ctt"));
+        // Test wether local constants still work in temporary context.
+        assertEquals("4", s.get("la").getValue());
+        assertEquals("5", s.get("lb").getValue());
+        assertEquals("6", s.get("lc").getValue());
 
-        // // Redeclaring tmp constants from an allready left tmp scope
-        // s.addTemporaryConstant("att", 10);
-        // s.addTemporaryConstant("btt", 11);
-        // s.addTemporaryConstant("ctt", 12);
 
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 10), s.get("att"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 11), s.get("btt"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 12), s.get("ctt"));
+        /* Test temporary scope at depth 2 */
+        s.enterTemporaryScope();
+        assertEquals(s.currentTemporaryScopeDepth(), 2);
 
-        // /* test if scopes of 2 functions don't crash */
-        // s.switchToGlobalContext();
-        // Function f2 = new Function(NativeTypes.VOID, "foo");
-        // s.createLocalScope(f2);
-        // s.switchContext(f2);
+        s.putConstant("att", "10");
+        s.putConstant("btt", "11");
+        s.putConstant("ctt", "12");
 
-        // // Locals from f1 not accessible
-        // assertNull(s.get("la"));
-        // assertNull(s.get("lb"));
-        // assertNull(s.get("lc"));
+        assertEquals("10", s.get("att").getValue());
+        assertEquals("11", s.get("btt").getValue());
+        assertEquals("12", s.get("ctt").getValue());
 
-        // // can create constants with the same name as f1
-        // s.addLocalConstant("la", 0);
-        // s.addLocalConstant("lb", 0);
-        // s.addLocalConstant("lc", 0);
+        // Test wether constants at depth 1 still work
+        assertEquals("7", s.get("at").getValue());
+        assertEquals("8", s.get("bt").getValue());
+        assertEquals("9", s.get("ct").getValue());
 
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 0), s.get("la"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 0), s.get("lb"));
-        // assertEquals(new Pair<Type, Integer>(Type.CONSTANT, 0), s.get("lc"));
+        // Test wether global constants still work in temporary context.
+        assertEquals("1", s.get("a").getValue());
+        assertEquals("2", s.get("b").getValue());
+        assertEquals("3", s.get("c").getValue());
+
+        // Test wether local constants still work in temporary context.
+        assertEquals("4", s.get("la").getValue());
+        assertEquals("5", s.get("lb").getValue());
+        assertEquals("6", s.get("lc").getValue());
+
+        /* Test leaving scope at depth 2*/
+        s.leaveTemporaryScope();
+        assertEquals(Scope.TEMPORARY, s.currentScope());
+        assertEquals(s.currentTemporaryScopeDepth(), 1);
+
+        // Depth 2 not accessible anymore
+        assertNull(s.get("att"));
+        assertNull(s.get("btt"));
+        assertNull(s.get("ctt"));
+
+        // Depth 1 still accessible
+        assertEquals("7", s.get("at").getValue());
+        assertEquals("8", s.get("bt").getValue());
+        assertEquals("9", s.get("ct").getValue());
+
+
+        /* Reentering depth 2 does not use the same variables */
+        s.enterTemporaryScope();
+        assertEquals(2, s.currentTemporaryScopeDepth());
+
+        assertNull(s.get("att"));
+        assertNull(s.get("btt"));
+        assertNull(s.get("ctt"));
+
+        // Redeclaring tmp constants from an allready left tmp scope
+        s.putConstant("att", "10");
+        s.putConstant("btt", "11");
+        s.putConstant("ctt", "12");
+
+        assertEquals("10", s.get("att").getValue());
+        assertEquals("11", s.get("btt").getValue());
+        assertEquals("12", s.get("ctt").getValue());
+
+        /* test if scopes of 2 functions don't crash */
+        s.switchToGlobalContext();
+        Function f2 = new Function(NativeTypes.VOID, "foo");
+        s.createLocalScope(f2);
+        s.switchContext(f2);
+
+        // Locals from f1 not accessible
+        assertNull(s.get("la"));
+        assertNull(s.get("lb"));
+        assertNull(s.get("lc"));
+
+        // can create constants with the same name as f1
+        s.putConstant("la", "0");
+        s.putConstant("lb", "0");
+        s.putConstant("lc", "0");
+
+        assertEquals("0", s.get("la").getValue());
+        assertEquals("0", s.get("lb").getValue());
+        assertEquals("0", s.get("lc").getValue());
 
     }
 
