@@ -224,19 +224,19 @@ public class ScopeManager {
         return false;
     }
 
-    public boolean putGlobConst(String name, String value){
+    private boolean putGlobConst(String name, String value){
         if(get(name) != null) return false;
         return globalConstants.putIfAbsent(name, value) == null;
     }
 
-    public boolean putLocalConst(String name, String value){
+    private boolean putLocalConst(String name, String value){
         if(get(name) != null) return false;
         if(currentConstants == null) return false;
 
         return currentConstants.putIfAbsent(name, value) != null;
     }
 
-    public boolean putTemporaryConst(String name, String value){
+    private boolean putTemporaryConst(String name, String value){
         if(get(name) != null) return false;
         if(temporaryConstants.size() == 0) return false;
 
@@ -249,7 +249,7 @@ public class ScopeManager {
         if(currentConstants == null){
             return Scope.GLOBAL;
         }
-        if(currentConstants != null && temporaryConstants == null;){
+        if(currentConstants != null && temporaryConstants == null){
             return Scope.LOCAL;
         }
         return Scope.TEMPORARY;

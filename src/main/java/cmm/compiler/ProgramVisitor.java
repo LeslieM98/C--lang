@@ -11,6 +11,7 @@ import cmm.compiler.generated.CmmParser.*;
 import cmm.compiler.generated.*;
 import cmm.compiler.exception.*;
 import cmm.compiler.utillity.*;
+import cmm.compiler.utillity.ScopeManager.Identifier;
 import cmm.compiler.utillity.ScopeManager.Type;
 import jas.*;
 
@@ -118,17 +119,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         boolean successfull = true;
 
         // Try to add in global scope
-        if(!scopes.inLocalScope()){
-            successfull &= scopes.addGlobalConstant(name, value);
-        } else {
-            if(scopes.currentTempScopeDepth() == 0){
-                // Try to add in local scope
-                successfull &= scopes.addLocalConstant(name, Integer.parseInt(value));
-            } else {
-                // Try to add in current temporary scope
-                successfull &= scopes.addTemporaryConstant(name, Integer.parseInt(value));
-            }
-        }
+        scopes.putConstant(name, value);
+
 
         if(!successfull){
             throw new AllreadyDefinedException(tk, "Redefinition of constant");
@@ -219,6 +211,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
                 throw new AllreadyDefinedException(c.variableName, "Param allready defined");
             }
 
+            
+
             params.add(new Pair<>(
                 c.variableName.getText(),
                 toNativeTypes(c.TYPE().getText())
@@ -234,6 +228,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         definedFunctions.add(f);
         scopes.createLocalScope(f);
         scopes.switchContext(f);
+
+        // Add parameters as local variables.
+
+        params.forEach(x -> scopes.putVar(x.getLeft()));
 
         // Generate Jasmin            
 
@@ -258,7 +256,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         List<String> functionBody = visit(ctx.function_body());
 
         methodHead.append(")")
-            .append((f.getReturnType() == NativeTypes.VOID) ? "V" : "I");
+            .append((f.getReturnType() == NativeTypes.VOID) ? "V" : "D");
 
         asm.add(methodHead.toString());
         asm.add(".limit stack " + (functionBody.size()));
@@ -499,22 +497,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     public List<String> visitVariable(VariableContext ctx) {
         List<String> asm = new ArrayList<>();
         
-        Pair<ScopeManager.Type, String> glob = scopes.getGlobal(ctx.variableName.getText());
-        Pair<ScopeManager.Type, Integer> loc = scopes.get(ctx.variableName.getText());
+        Identifier id = scopes.get(ctx.getText());
 
-        if(glob != null){
-            switch(glob.getLeft()){
-                case CONSTANT: 
-                    asm.add("ldc2_w " + Double.parseDouble(glob.getRight()));
-                    break;
-            }
-        } else if(loc != null){
-            switch(loc.getLeft()){
-                case CONSTANT:
-                    asm.add("ldc2_w " + (double) loc.getRight());
-                    break;
-            }
-
+        if(id.getType() == Type.CONSTANT){
+            asm.add(id.getValue());
         } else {
 
         }
