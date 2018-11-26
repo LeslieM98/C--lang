@@ -162,7 +162,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
 
 
-        return max;
+        return max + 1;
     }
 
 
