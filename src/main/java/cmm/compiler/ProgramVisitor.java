@@ -591,6 +591,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             asm.addAll(visit(ctx.onFalse));
         }
         asm.add("label_branch" + ++branchDepth + ":");
+         // When we have nested if-structures we need to make sure, that there are no
+         // naming conflicts between the labels
+        branchDepth++;
         return asm;
     }
 }

@@ -82,7 +82,7 @@ returnstatement
 
 
 statementList
-    : statement*;
+    : statements=statement*;
 
 variable_declaration
     : dec=generic_variable_declaration #vardec

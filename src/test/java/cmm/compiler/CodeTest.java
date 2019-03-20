@@ -683,6 +683,17 @@ public class CodeTest{
         assertEquals(expected, runCmm(input));
     }
 
+    @Disabled
+    @Test
+    public void testNestedBranches() {
+        String input, expected;
+        
+        input = "void main(){if(1) { println(1); if(0){println(1);} else{println(0); if(1){println(1);} } }}";
+        expected = "1"+System.lineSeparator()+"0"+System.lineSeparator()+"1"+System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+    }
+
     public static void main(String[] args) {
         App a = new App();
         String[] arg = {"-j", "test.txt"};
