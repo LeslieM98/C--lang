@@ -426,19 +426,19 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String instruction = determineConjunctionOperation(ctx.operator.getText());
 
         List<String> asm = visit(ctx.left);
-        asm.add("dconst_0");
-        asm.add("dcmpg");   // compare left with 0
+        asm.add("iconst_0");
+        asm.add("isub");   // compare left with 0
 
         asm.addAll(visit(ctx.right));
-        asm.add("dconst_0");
-        asm.add("dcmpg");   // compare right with 0
+        asm.add("iconst_0");
+        asm.add("icmpg");   // compare right with 0
 
         asm.add(instruction);
         asm.add("ifne " + branchL);
-        asm.add("dconst_0");
+        asm.add("iconst_0");
         asm.add("goto " + doneL);
         asm.add(branchL + ":");
-        asm.add("dconst_1");
+        asm.add("iconst_1");
         asm.add(doneL + ":");
 
         return asm;
