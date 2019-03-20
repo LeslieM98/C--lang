@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.Token;
  * @author Leslie Marxen
  */
 
-public class AllreadyDefinedException extends CompileException{
+public class AllreadyDefinedException extends CompileRuntimeException{
 
 	private static final long serialVersionUID = 1331844359857598715L;
 

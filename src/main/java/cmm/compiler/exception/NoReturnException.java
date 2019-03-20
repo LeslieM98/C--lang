@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.Token;
  */
 
 
-public class NoReturnException extends CompileException {
+public class NoReturnException extends CompileRuntimeException {
 
 	private static final long serialVersionUID = 1186707250291339357L;
 
