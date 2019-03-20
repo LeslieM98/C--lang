@@ -293,25 +293,33 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
+
+    List<Pair<ExpressionContext, NativeTypes>> determineArguments(Function_callContext ctx){
+        List<Pair<ExpressionContext, NativeTypes>> result = new ArrayList<>();
+
+        for (ExpressionContext x : ctx.expression_list().expressions) {
+            result.add(new Pair(x, NativeTypes.NUM));
+        }
+        
+        return result;
+    }
+
     @Override
     public List<String> visitFunction_call(Function_callContext ctx) {
-        String functionName = ctx.functionName.getText();
         List<String> asm = new ArrayList<>();
-        if ("println".equals(functionName)) {
-            asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
-            String toPrint = ctx.arguments.expression.getText();
-            asm.addAll(visit(ctx.arguments.expression)); // rather let the parser do all work instead of doing it by hand.
-            // double value;
-            // try {
-            //     value = Double.valueOf(toPrint);
-            //     asm.add("ldc2_w " + value);
-            // } catch(NumberFormatException e) {
-            //     Pair<Type, Integer> varToLoad = scopes.get(toPrint);
-            //     asm.add("iload " + varToLoad.getRight());
-            // }
-            asm.add("invokevirtual java/io/PrintStream/println(I)V");    
-        }
-        asm.add(System.lineSeparator());
+        List<Pair<ExpressionContext, NativeTypes>> args = determineArguments(ctx);
+
+        asm.addAll(
+            args.stream()
+                .map(Pair::getLeft)
+                .map(this::visit)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList())
+        );
+
+        StringBuilder functionHead = new StringBuilder();
+        // TODO: FINISH
+
         return asm;
     }
 
