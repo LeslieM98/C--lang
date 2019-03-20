@@ -85,8 +85,8 @@ statementList
     : statement*;
 
 variable_declaration
-    : generic_variable_declaration #vardec
-    | generic_variable_declaration ASSIGN val=expression #vardecassign
+    : dec=generic_variable_declaration #vardec
+    | dec=generic_variable_declaration ASSIGN val=expression #vardecassign
     | 'const' dec=generic_variable_declaration ASSIGN val=expression #constdec
     ;
 

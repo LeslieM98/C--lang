@@ -11,7 +11,7 @@ import cmm.compiler.exception.*;
 import cmm.compiler.utillity.*;
 import cmm.compiler.utillity.ScopeManager.Identifier;
 import cmm.compiler.utillity.ScopeManager.Type;
-import jas.*;
+
 
 public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
@@ -125,6 +125,13 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         }
 
         return null;
+    }
+    
+    @Override
+    public List<String> visitVardec(VardecContext ctx) {
+    	Token tk = ctx.dec.variableName;
+    	String name = ctx.dec.variableName.getText();
+    	return null;
     }
 
 
