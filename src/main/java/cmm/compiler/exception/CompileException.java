@@ -3,15 +3,16 @@ package cmm.compiler.exception;
 import org.antlr.v4.runtime.Token;
 
 /**
- * A class that sets the base for any Compile Error rised by compiling a 
- * C-- source document. Every Compile Error has to extend this class.
- * This Exception is unchecked and does not need to be catched.
- * and potentially overwrite {@link #getPrefix()} and
+ * A class that sets the base for any Compile Error raised by compiling a 
+ * C-- source document. Every Compile error that should be a
+ * checked exception has to extend this class
+ * This Exception is checked.
  * 
  * @author Leslie Marxen
+ * @author Lukas Raubuch
  */
 
-public abstract class CompileException extends RuntimeException{
+public abstract class CompileException extends Exception {
 	
 	private static final long serialVersionUID = -5044538189423039146L;
 
