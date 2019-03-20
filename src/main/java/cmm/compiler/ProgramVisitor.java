@@ -485,12 +485,12 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         String instruction = determineRelationalOperation(ctx.operator.getText());
         
-        asm.add("dcmpg");
+        asm.add("isub");
         asm.add(instruction + " " + relationalL);
-        asm.add("dconst_0");
+        asm.add("iconst_0");
         asm.add("goto " + relationalDoneL);
         asm.add(relationalL + ":");
-        asm.add("dconst_1");
+        asm.add("iconst_1");
         asm.add(relationalDoneL + ":");
 
         return asm;
