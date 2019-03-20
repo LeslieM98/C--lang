@@ -142,9 +142,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String tmp;
 
         for (String x : asm) {
-            if(x.contains("dstore")){
+            if(x.contains("istore")){
                 tmp = x.trim()
-                    .replaceAll("dstore", "")
+                    .replaceAll("istore", "")
                     .trim();
 
                 pos = tmp.indexOf(' ');
@@ -153,9 +153,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
                 Math.max(max, num);
             }
 
-            if(x.contains("dload")){
+            if(x.contains("iload")){
                 tmp = x.trim()
-                    .replaceAll("dload", "")
+                    .replaceAll("iload", "")
                     .trim();
 
                 pos = tmp.indexOf(' ');
