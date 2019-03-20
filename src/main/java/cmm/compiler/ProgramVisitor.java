@@ -41,8 +41,29 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         List<String> asm = new ArrayList<>();
 
         if(!allreadyAddedClassDef){
+            // Inheritance and def
             asm.add(".class public " + programName);
             asm.add(".super java/lang/Object");
+
+            // Default ctor
+            asm.add(".method public <init>()V");
+            asm.add("aload_0");
+            asm.add("invokespecial java/lang/Object/<init>()V");
+            asm.add("return");
+            asm.add(".end method");
+
+            // Program entry
+            asm.add(".method public static main([Ljava/lang/String;)V");
+            asm.add(".limit stack 20");
+            asm.add(".limit locals 1");
+            asm.add("new Test");
+            asm.add("dup");
+            asm.add("invokespecial Test/<init>()V");
+            asm.add("invokevirtual Test/start()V");
+            asm.add("return");
+            asm.add(".end method");
+
+            // Main Method
             asm.add(System.lineSeparator());
             allreadyAddedClassDef = true;
         }
