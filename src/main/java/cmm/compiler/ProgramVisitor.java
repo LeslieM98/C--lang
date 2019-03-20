@@ -293,7 +293,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             //     Pair<Type, Integer> varToLoad = scopes.get(toPrint);
             //     asm.add("iload " + varToLoad.getRight());
             // }
-            asm.add("invokevirtual java/io/PrintStream/println(D)V");    
+            asm.add("invokevirtual java/io/PrintStream/println(I)V");    
         }
         asm.add(System.lineSeparator());
         return asm;
@@ -431,7 +431,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         asm.addAll(visit(ctx.right));
         asm.add("iconst_0");
-        asm.add("icmpg");   // compare right with 0
+        asm.add("isub");   // compare right with 0
 
         asm.add(instruction);
         asm.add("ifne " + branchL);
@@ -523,9 +523,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     public List<String> visitNumber(NumberContext ctx) {
         List<String> asm = new ArrayList<>();
 
-        double value = Double.parseDouble(ctx.number.getText());
+        int value = Integer.parseInt(ctx.number.getText());
 
-        asm.add("ldc2_w " + value);
+        asm.add("ldc " + value);
 
 
         return asm;

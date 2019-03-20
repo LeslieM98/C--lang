@@ -416,20 +416,20 @@ public class CodeTest{
 
         // !=
         input = "void main(){println(1 != 2);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(2 != 2);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         // ==
         input = "void main(){println(1 == 2);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(2 == 2);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
     }
 
@@ -439,54 +439,54 @@ public class CodeTest{
         
         // <
         input = "void main(){println(1 < 2);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(2 < 2);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(3 < 2);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         // >
         input = "void main(){println(1 > 2);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(2 > 2);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(3 > 2);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         // <=
         input = "void main(){println(1 <= 2);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(2 <= 2);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(3 <= 2);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         // >=
         input = "void main(){println(1 >= 2);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(2 >= 2);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(3 >= 2);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
     }
 
@@ -495,15 +495,15 @@ public class CodeTest{
         String input, expected;
 
         input = "void main(){println(!0);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(!1);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(!20);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
 
@@ -516,87 +516,87 @@ public class CodeTest{
         
         // &&
         input = "void main(){println(1 && 1);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(1 && 0);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(0 && 0);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(0 && 1);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(-100 && 100);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(-100 && 0);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(100 && 0);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
 
         input = "void main(){println(1 && 0 && 1);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(1 && 1 && 1);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(0 && 0 && 0);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         // ||
         input = "void main(){println(1 || 1);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(1 || 0);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(0 || 0);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(0 || 1);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(-100 || 100);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(-100 || 0);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(100 || 0);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
 
 
         input = "void main(){println(1 || 0 || 1);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(1 || 1 || 1);}";
-        expected = "1.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(0 || 0 || 0);}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
     }
 
@@ -606,18 +606,18 @@ public class CodeTest{
 
 
         input = "void main(){println((1 < 2 || 1 > 2) && (2 >= 2 && (!(2 < 3))));}";
-        expected = "0.0" + System.lineSeparator();
+        expected = "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
         input = "void main(){println(1 < 2);println(1 > 2);println(2 >= 2);println(2 < 3);println(!(2 < 3));println(1 < 2 || 1 > 2);println(2 >= 2 && (!(2 < 3)));println((1 < 2 || 1 > 2) && (2 >= 2 && (!(2 < 3))));}";
-        expected = "1.0" + System.lineSeparator() + 
-        "0.0" + System.lineSeparator() + 
-        "1.0" + System.lineSeparator() + 
-        "1.0" + System.lineSeparator() + 
-        "0.0" + System.lineSeparator() + 
-        "1.0" + System.lineSeparator() + 
-        "0.0" + System.lineSeparator() + 
-        "0.0" + System.lineSeparator();
+        expected = "1" + System.lineSeparator() + 
+        "0" + System.lineSeparator() + 
+        "1" + System.lineSeparator() + 
+        "1" + System.lineSeparator() + 
+        "0" + System.lineSeparator() + 
+        "1" + System.lineSeparator() + 
+        "0" + System.lineSeparator() + 
+        "0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
     }
 
