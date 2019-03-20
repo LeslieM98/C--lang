@@ -334,7 +334,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         // Load right side of operation to stack
         List<String> asmRight = visit(ctx.right);
         asm.addAll(asmRight);    
-        asm.add("dcmpg");    
+        asm.add("isub");    
 
         String trueL, doneL;
         trueL = "EqBranch" + eqCounter;
@@ -344,10 +344,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String instruction = determineEqualityOperation(ctx.operator.getText());
 
         asm.add(instruction + " " + trueL);
-        asm.add("dconst_0");
+        asm.add("iconst_0");
         asm.add("goto " + doneL);
         asm.add(trueL + ":");
-        asm.add("dconst_1");
+        asm.add("iconst_1");
         asm.add(doneL + ":");
 
 
