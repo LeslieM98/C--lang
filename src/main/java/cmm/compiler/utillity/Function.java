@@ -115,6 +115,40 @@ public class Function{
     }
 
     /**
+     * Returns a representation that can be used in JVM ASM.
+     * Example Test(II)V
+     * @return the representaton
+     */
+    public String toSignature(){
+        StringBuilder signature = new StringBuilder(identifier)
+            .append("(");
+
+        if(getParameterCount() != 0){
+            for (Pair<String, NativeTypes> x : parameterList) {
+                switch (x.getRight()) {
+                    case NUM:
+                        signature.append("I");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        signature.append(")");
+        
+        switch (returnType) {
+            case NUM:
+                signature.append("I");
+                break;
+            case VOID:
+                signature.append("V");
+                break;
+        }
+
+        return signature.toString();
+    }
+
+    /**
      * Checks for equality.
      * Checks wether the signature of the function is the same.
      * @return True if equal, false if not.
