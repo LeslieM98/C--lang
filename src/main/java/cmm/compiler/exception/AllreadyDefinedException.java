@@ -11,7 +11,9 @@ import org.antlr.v4.runtime.Token;
 
 public class AllreadyDefinedException extends CompileException{
 
-    /**
+	private static final long serialVersionUID = 1331844359857598715L;
+
+	/**
      * Constructor for AllreadyDefinedException.
      * {@code tk} should point to the token that 
      * contains the name of the causing failure.

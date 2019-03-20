@@ -12,7 +12,10 @@ import org.antlr.v4.runtime.Token;
  */
 
 public abstract class CompileException extends RuntimeException{
-    /**
+	
+	private static final long serialVersionUID = -5044538189423039146L;
+
+	/**
      * The token that most likely caused the Exception
      */
     protected final Token tk;

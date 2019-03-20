@@ -11,7 +11,9 @@ import org.antlr.v4.runtime.Token;
 
 public class NoReturnException extends CompileException {
 
-    /**
+	private static final long serialVersionUID = 1186707250291339357L;
+
+	/**
      * Constructor for NoReturnException.
      * {@code tk} should point to the token that 
      * contains the name of the function causing failure.
