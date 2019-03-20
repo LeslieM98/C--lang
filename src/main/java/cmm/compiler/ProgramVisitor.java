@@ -17,6 +17,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
     private final String programName;
     private boolean allreadyAddedClassDef;
+    private int branchDepth;
 
     private ScopeManager scopes;
 
@@ -575,5 +576,21 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	asm.addAll(visit(ctx.right)); // evaluate right expression onto the stack
     	asm.add("imul"); // divide left by right
     	return asm;
+    }
+
+    @Override
+    public List<String> visitBranch(BranchContext ctx) {
+        List<String> asm = new ArrayList<>();
+        asm.addAll(visit(ctx.condition)); // evaluate the condition and put it onto the stack
+        asm.add("iconst_0"); // put fals value onto the stack
+        asm.add("if_icmpeq label_branch" + branchDepth);
+        asm.addAll(visit(ctx.onTrue));
+        asm.add("goto label_branch" + ++branchDepth);
+        asm.add("label_branch"+ --branchDepth + ":");
+        if(ctx.onFalse != null) {
+            asm.addAll(visit(ctx.onFalse));
+        }
+        asm.add("label_branch" + ++branchDepth + ":");
+        return asm;
     }
 }
