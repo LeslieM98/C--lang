@@ -255,12 +255,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         NativeTypes retType = toNativeTypes(ctx.function_header().ret.getText());
 
         // Determine parametercount
-        int paramcount = ctx.function_header().getChildCount();
-        paramcount -= 4; // - num, name, (, )
-        paramcount -= paramcount/2; // Extract ',' count
 
         // Determine parameters
-         List<Pair<String, NativeTypes>> params = determineParameters(ctx.function_header());
+        List<Pair<String, NativeTypes>> params = determineParameters(ctx.function_header());
 
         // Assemble function
         Function f = new Function(retType, name, params);
