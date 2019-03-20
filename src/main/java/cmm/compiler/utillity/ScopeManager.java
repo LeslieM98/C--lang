@@ -55,7 +55,11 @@ public class ScopeManager {
         localConstantScopes = new HashMap<>();
     }
 
-
+    /**
+     * Returns a tuple containing needed information about a given identifier {@see Identifier}
+     * @param name the name of the identifier
+     * @return a tuple
+     */
     public Identifier get(String name){
         String value;
 
@@ -111,6 +115,11 @@ public class ScopeManager {
 
     }
 
+    /**
+     * If a program enters a function scope this method is called creating a function scope that is mapped to the function.
+     * @param f the function that contains this scope
+     * @return true if successfully added a new scope
+     */
     public boolean createLocalScope(Function f){
         if(localConstantScopes.containsKey(f) || localVariableScopes.containsKey(f)){
             return false;
@@ -138,6 +147,10 @@ public class ScopeManager {
         return true;
     }
 
+    /**
+     * Sets the current context to a global context
+     */
+
     public void switchToGlobalContext(){
         currentConstants = null;
         currentVariables = null;
@@ -146,15 +159,29 @@ public class ScopeManager {
         temporaryVariables = null;
     }
 
+    /**
+     * clears the current nested temporary scopes. leaving all emporary scopes effectively
+     */
+
     private void resetTemporary(){
         temporaryConstants = null;
         temporaryVariables = null;
     }
 
+    /**
+     * If the current scope is currently in a nested temporary scope the scope depth is returned
+     * @return the current temporary scope depth
+     */
+
     public int currentTemporaryScopeDepth(){
         if(temporaryConstants == null) return 0;
         return temporaryConstants.size();
     }
+
+    /**
+     * Steps into a new temporary scope. Creates a new temporary scope that is then also entered.
+     * @return 
+     */
 
     public boolean enterTemporaryScope(){
         if(temporaryConstants == null || temporaryVariables == null){
@@ -166,6 +193,10 @@ public class ScopeManager {
         return true;
     }
 
+    /**
+     * Steps out of the deepest temporary scope. Also destroys it
+     */
+
     public void leaveTemporaryScope(){
         if(currentTemporaryScopeDepth() == 1){
             resetTemporary();
@@ -176,6 +207,11 @@ public class ScopeManager {
         }
     }
 
+    /**
+     * Puts a variable in the current scope. Scopes are GLOBAL, LOCAL or TEMPORARY depending on what scope is currently used in the program.
+     * @param name the identifier of the variable
+     * @return true if the variable was successfully created, false if otherwise.
+     */
     
     public boolean putVar(String name){
         switch (currentScope()) {
@@ -190,11 +226,22 @@ public class ScopeManager {
         }
     }
 
+    /**
+     * Puts a variable in the global scope.
+     * @param name the name of the variable
+     * @return true if succesfolly created, false if otherwise.
+     */
     private boolean putGlobVar(String name){
         if(get(name) != null) return false;
         return globalVariables.putIfAbsent(name, name) != null;
     }
 
+    /**
+     * Puts a variable in the local scope. Effectively searching for a free spot in the locals 
+     * array and assigning an index to it in the first free spot, making it memory efficient.
+     * @param name the name of the variable
+     * @return true if successfully created, false if otherwise.
+     */
     private boolean putLocalVar(String name){
         if(currentVariables == null) return false;
         if(get(name) != null) return false;
@@ -208,6 +255,12 @@ public class ScopeManager {
         return false;
     }
 
+    /**
+     * Puts a variable in the Temporary scope. Effectively searches the whole locals array for a free 
+     * spot and assigning that index to the variable, making it memory efficient.
+     * @param name the name of the identifier
+     * @return true if successfully created, false if not
+     */
     private boolean putTemporaryVar(String name){
         if(get(name) != null) return false;
         if(temporaryVariables.size() == 0) return false;
@@ -231,7 +284,12 @@ public class ScopeManager {
         return false;
     }
 
-
+    /**
+     * Puts a constant in the current scope and assigns a value to it manually.
+     * @param name the name of the constant:
+     * @param value the value assigned to the constant.
+     * @return true if successfully created, false if otherwise.
+     */
     public boolean putConstant(String name, String value){
         switch (currentScope()) {
             case GLOBAL:
@@ -245,11 +303,23 @@ public class ScopeManager {
         }
     }
 
+    /**
+     * Puts a constant in the global scope and assigns a value to it manually.
+     * @param name the name of the constant.
+     * @param value the value assigned to the constant.
+     * @return true if successfully created, false if otherwise.
+     */
     private boolean putGlobConst(String name, String value){
         if(get(name) != null) return false;
         return globalConstants.putIfAbsent(name, value) == null;
     }
 
+    /**
+     * Puts a constant in the local scope and assigns a value to it manually.
+     * @param name the name of the constant
+     * @param value the value assigned to the constant.
+     * @return true if successfully created, false if otherwise.
+     */
     private boolean putLocalConst(String name, String value){
         if(get(name) != null) return false;
         if(currentConstants == null) return false;
@@ -257,6 +327,12 @@ public class ScopeManager {
         return currentConstants.putIfAbsent(name, value) != null;
     }
 
+    /**
+     * Puts a constant in the deepest temporary scope and assigns a value to it manually.
+     * @param name the name of the constant
+     * @param value the value of the constant
+     * @return true if successfully created, false if otherwise.
+     */
     private boolean putTemporaryConst(String name, String value){
         if(get(name) != null) return false;
         if(temporaryConstants.size() == 0) return false;
@@ -266,6 +342,10 @@ public class ScopeManager {
         return tmp.putIfAbsent(name, value) == null;
     }
 
+    /**
+     * Returns in what scope the manager is currently. Meaning the deepest scope that is available at the time
+     * @return enum variable containing the scope
+     */
     public Scope currentScope(){
         if(currentConstants == null){
             return Scope.GLOBAL;
@@ -296,6 +376,14 @@ public class ScopeManager {
         TEMPORARY;
     }
 
+    /**
+     * represents how an identifier is treated within the scopemanager. Meaning, it stores information about how the 
+     * identifier has to be treated: \n 
+     * - The Identifiertype (constant, variable). To chose wether the actual value is just to be replaced in the code or stored somewhere in the JVM\n
+     * - The Scope it was defined in (Temporary, local, gloabl). To see if necessary how the jvm stores the actual value (global attribute or locals array)
+     * - The name of the Identifier.
+     * - The value of the identifier (actual value of the constant, or accessinformation if it was a variable).
+     */
     public static class Identifier{
         private final Scope scope;
         private final Type type;
