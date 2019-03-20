@@ -1,6 +1,7 @@
 package cmm.compiler;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -181,6 +182,33 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
 
+
+
+
+
+
+
+    /**
+     * F:joy function header. Transforms them to a list of identifiers and types.
+     * @:joyill be scanned.
+     * @:joyith their types.
+     */
+    List<Pair<String, NativeTypes>> determineParameters(Function_headerContext ctx) {
+        List<Pair<String, NativeTypes>> result = new ArrayList<>();
+        
+        List<Generic_variable_declarationContext> paramDecs = ctx.children.stream().
+            filter(x -> x instanceof Generic_variable_declarationContext).
+            map(x -> (Generic_variable_declarationContext) x).
+            collect(Collectors.toList());
+
+        for (Generic_variable_declarationContext x : paramDecs) {
+            result.add(new Pair<String,NativeTypes>(x.IDENTIFIER().getText(), NativeTypes.NUM));
+        }
+
+        return result;
+    }
+
+
     private static final Function PROGRAM_ENTRY = new Function(NativeTypes.VOID, "main");
     /**
      * Breaks up a function definition into name, return type, parametercount, 
@@ -211,29 +239,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         paramcount -= paramcount/2; // Extract ',' count
 
         // Determine parameters
-        List<Pair<String, NativeTypes>> params = new ArrayList<>();
-        Pair<String, NativeTypes> tmpPair;
-        Generic_variable_declarationContext c;
-        for(int i = 0; i/2 < paramcount; i+=2){
-            c = ctx.function_header().getChild(Generic_variable_declarationContext.class, 3 + i);
-
-            tmpPair = new Pair<>(
-                c.variableName.getText(),
-                toNativeTypes(c.TYPE().getText())
-            );
-
-            if(params.contains(tmpPair)){
-                throw new AllreadyDefinedException(c.variableName, "Param allready defined");
-            }
-
-            
-
-            params.add(new Pair<>(
-                c.variableName.getText(),
-                toNativeTypes(c.TYPE().getText())
-                
-            ));
-        }
+         List<Pair<String, NativeTypes>> params = determineParameters(ctx.function_header());
 
         // Assemble function
         Function f = new Function(retType, name, params);
