@@ -316,8 +316,19 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     @Override
     public List<String> visitFunction_call(Function_callContext ctx) {
         List<String> asm = new ArrayList<>();
-        List<Pair<ExpressionContext, NativeTypes>> args = determineArguments(ctx);
 
+        List<Pair<ExpressionContext, NativeTypes>> args = determineArguments(ctx);
+        List<Pair<String, NativeTypes>> rawArgs = args.stream()
+            .map(x -> new Pair(x.getLeft().getText(), x.getRight()))
+            .collect(Collectors.toList());
+
+        Function f = new Function(NativeTypes.NUM, ctx.IDENTIFIER().getText(), rawArgs);
+        StringBuilder functionCall = new StringBuilder()
+            .append("invokevirtual ")
+            .append(programName + "/")
+            .append(f.toSignature());
+
+        asm.add("aload_0"); // push this ptr
         asm.addAll(
             args.stream()
                 .map(Pair::getLeft)
@@ -325,9 +336,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList())
         );
-
-        StringBuilder functionHead = new StringBuilder();
-        // TODO: FINISH
+        asm.add(functionCall.toString());
+        
 
         return asm;
     }
