@@ -129,11 +129,21 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     
     @Override
     public List<String> visitVardec(VardecContext ctx) {
-    	Token tk = ctx.dec.variableName;
     	String name = ctx.dec.variableName.getText();
+    	scopes.putVar(name);
     	return null;
     }
+    
 
+    @Override
+    public List<String> visitVardecassign(VardecassignContext ctx) {
+    	String name = ctx.dec.variableName.getText();
+    	String value = ctx.val.getText();
+    	
+
+    	
+    	return null;
+    }
 
     private int localVarCount(List<String> asm){
         int num;
@@ -293,7 +303,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             //     Pair<Type, Integer> varToLoad = scopes.get(toPrint);
             //     asm.add("iload " + varToLoad.getRight());
             // }
-            asm.add("invokevirtual java/io/PrintStream/println(D)V");    
+            asm.add("invokevirtual java/io/PrintStream/println(I)V");    
         }
         asm.add(System.lineSeparator());
         return asm;
@@ -523,14 +533,47 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     public List<String> visitNumber(NumberContext ctx) {
         List<String> asm = new ArrayList<>();
 
-        double value = Double.parseDouble(ctx.number.getText());
+        int value = Integer.parseInt(ctx.number.getText());
 
-        asm.add("ldc2_w " + value);
+        asm.add("ldc " + value);
 
 
         return asm;
     }
 
+    @Override
+    public List<String> visitPlus(PlusContext ctx) {
+    	List<String> asm = new ArrayList<>();
+    	asm.addAll(visit(ctx.left)); // evaluate left expression onto the stack
+    	asm.addAll(visit(ctx.right)); // evaluate right expression onto the stack
+    	asm.add("iadd"); // add left and right
+    	return asm;
+    }
 
-
+    @Override
+    public List<String> visitMinus(MinusContext ctx) {
+    	List<String> asm = new ArrayList<>();
+    	asm.addAll(visit(ctx.left)); // evaluate left expression onto the stack
+    	asm.addAll(visit(ctx.right)); // evaluate right expression onto the stack
+    	asm.add("isub"); // subtract right from left
+    	return asm;
+    }
+    
+    @Override
+    public List<String> visitDivision(DivisionContext ctx) {
+    	List<String> asm = new ArrayList<>();
+    	asm.addAll(visit(ctx.left)); // evaluate left expression onto the stack
+    	asm.addAll(visit(ctx.right)); // evaluate right expression onto the stack
+    	asm.add("idiv"); // divide left by right
+    	return asm;
+    }
+    
+    @Override
+    public List<String> visitMultiplication(MultiplicationContext ctx) {
+    	List<String> asm = new ArrayList<>();
+    	asm.addAll(visit(ctx.left)); // evaluate left expression onto the stack
+    	asm.addAll(visit(ctx.right)); // evaluate right expression onto the stack
+    	asm.add("imul"); // divide left by right
+    	return asm;
+    }
 }

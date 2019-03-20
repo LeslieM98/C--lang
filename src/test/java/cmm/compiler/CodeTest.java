@@ -411,6 +411,11 @@ public class CodeTest{
     }
 
     @Test
+    public void testLocalVariables() {
+    	
+    }
+    
+    @Test
     public void testEquality(){
         String input, expected, actual;
 
@@ -619,6 +624,42 @@ public class CodeTest{
         "0.0" + System.lineSeparator() + 
         "0.0" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
+    }
+    
+    @Test
+    public void testPlus() {
+    	String input, expected;
+    	
+    	input = "void main(){println(1 + 3);}";
+    	expected = "4" + System.lineSeparator();
+    	assertEquals(expected, runCmm(input));
+    }
+    
+    @Test
+    public void testMinus() {
+    	String input, expected;
+    	
+    	input = "void main(){println(5 - 2);}";
+    	expected = "3" + System.lineSeparator();
+    	assertEquals(expected, runCmm(input));
+    }
+    
+    @Test
+    public void testDivision() {
+    	String input, expected;
+    	
+    	input = "void main(){println(6 / 2);}";
+    	expected = "3" + System.lineSeparator();
+    	assertEquals(expected, runCmm(input));
+    }
+    
+    @Test
+    public void testMultiplication() {
+    	String input, expected;
+    	
+    	input = "void main(){println(2 * 4);}";
+    	expected = "8" + System.lineSeparator();
+    	assertEquals(expected, runCmm(input));
     }
 
     public static void main(String[] args) {
