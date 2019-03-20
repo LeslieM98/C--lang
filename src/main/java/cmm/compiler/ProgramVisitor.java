@@ -378,13 +378,13 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         doneL = "NotDone" + notCounter;
         notCounter++;
 
-        asm.add("dconst_0");
-        asm.add("dcmpg");
+        asm.add("iconst_0");
+        asm.add("isub");
         asm.add("ifeq " + notL);
-        asm.add("dconst_0");
+        asm.add("iconst_0");
         asm.add("goto " + doneL);
         asm.add(notL + ":");
-        asm.add("dconst_1");
+        asm.add("iconst_1");
         asm.add(doneL + ":");
 
 
