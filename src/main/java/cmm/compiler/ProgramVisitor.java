@@ -31,9 +31,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         definedFunctions = new ArrayList<>();
         this.programName = programName;
         allreadyAddedClassDef = false;
-
-        // specific countervars for visit functions
-        // eqCounter = 0;
+        definedFunctions.add(SYSOUT);
     }
 
     @Override
@@ -230,7 +228,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
 
-    private static final Function PROGRAM_ENTRY = new Function(NativeTypes.VOID, "main");
+    private static final Function PROGRAM_ENTRY = new Function(NativeTypes.VOID, "main", List.of());
     /**
      * Breaks up a function definition into name, return type, parametercount, 
      * parametertypes. Checks wether it is allready defined. Creates a new 
@@ -254,8 +252,6 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String name = ctx.function_header().functionName.getText();
         NativeTypes retType = toNativeTypes(ctx.function_header().ret.getText());
 
-        // Determine parametercount
-
         // Determine parameters
         List<Pair<String, NativeTypes>> params = determineParameters(ctx.function_header());
 
@@ -277,13 +273,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         StringBuilder methodHead = new StringBuilder()
             .append(".method ")
             .append("public ")
-            .append("static ")
             .append(f.toSignature());
 
         List<String> functionBody = visit(ctx.function_body());
-
-        methodHead.append(")")
-            .append((f.getReturnType() == NativeTypes.VOID) ? "V" : "D");
 
         asm.add(methodHead.toString());
         asm.add(".limit stack " + (functionBody.size()));
@@ -310,6 +302,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return result;
     }
 
+
+
+    private static final Function SYSOUT = new Function(NativeTypes.VOID, "println", List.of(new Pair("n", NativeTypes.NUM)));
     @Override
     public List<String> visitFunction_call(Function_callContext ctx) {
         List<String> asm = new ArrayList<>();
@@ -320,12 +315,25 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             .collect(Collectors.toList());
 
         Function f = new Function(NativeTypes.NUM, ctx.IDENTIFIER().getText(), rawArgs);
-        StringBuilder functionCall = new StringBuilder()
-            .append("invokevirtual ")
-            .append(programName + "/")
-            .append(f.toSignature());
 
-        asm.add("aload_0"); // push this ptr
+        if(!definedFunctions.contains(f)){
+            throw new UndefinedSymbolException(ctx.IDENTIFIER().getSymbol(), "Could not resolve function call");
+        }
+
+        StringBuilder functionCall = new StringBuilder("invokevirtual ");
+            
+        if(f.equals(SYSOUT)){
+            functionCall.append("java/io/PrintStream/println(I)V");
+            asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
+        } else {
+            functionCall
+                .append(programName + "/")
+                .append(f.toSignature());
+            asm.add("aload_0"); // push this ptr
+        }
+        
+
+
         asm.addAll(
             args.stream()
                 .map(Pair::getLeft)

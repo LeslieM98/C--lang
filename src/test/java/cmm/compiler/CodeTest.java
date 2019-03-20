@@ -260,7 +260,7 @@ public class CodeTest{
 
 
         /* Test if local constants returns correct values. */
-        Function f1 = new Function(NativeTypes.VOID, "foo", new Pair<>("a", NativeTypes.NUM));
+        Function f1 = new Function(NativeTypes.VOID, "foo", List.of(new Pair<String, NativeTypes>("a", NativeTypes.NUM)));
         s.createLocalScope(f1);
         s.switchContext(f1);
         assertEquals(Scope.LOCAL, s.currentScope());
@@ -390,7 +390,7 @@ public class CodeTest{
 
         /* test if scopes of 2 functions don't crash */
         s.switchToGlobalContext();
-        Function f2 = new Function(NativeTypes.VOID, "foo");
+        Function f2 = new Function(NativeTypes.VOID, "foo", List.of());
         s.createLocalScope(f2);
         s.switchContext(f2);
 
@@ -497,19 +497,22 @@ public class CodeTest{
 
     @Test
     public void testNot(){
-        String input, expected;
+        String input, expected, actual;
 
         input = "void main(){println(!0);}";
         expected = "1" + System.lineSeparator();
-        assertEquals(expected, runCmm(input));
+        actual = runCmm(input);
+        assertEquals(expected, actual);
 
         input = "void main(){println(!1);}";
         expected = "0" + System.lineSeparator();
-        assertEquals(expected, runCmm(input));
+        actual = runCmm(input);
+        assertEquals(expected, actual);
 
         input = "void main(){println(!20);}";
         expected = "0" + System.lineSeparator();
-        assertEquals(expected, runCmm(input));
+        actual = runCmm(input);
+        assertEquals(expected, actual);
 
 
     }

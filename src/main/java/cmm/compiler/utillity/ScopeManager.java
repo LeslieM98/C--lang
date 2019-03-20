@@ -127,6 +127,8 @@ public class ScopeManager {
 
         localConstantScopes.putIfAbsent(f, new HashMap<>());
         localVariableScopes.putIfAbsent(f, new HashMap<>());
+
+        putLocalVar("this");
         return true;
     }
 

@@ -36,19 +36,19 @@ public class Function{
         returnType = NativeTypes.VOID;
     }
 
-    /**
-     * Constructor with vararg parameter.
-     * @param returnType The returntype of the defined funtction.
-     * @param identifier The name of the function.
-     * @param parameterList A parameterlist in correct order.
-     */
-    public Function(NativeTypes returnType, String identifier, Pair<String, NativeTypes>... parameterList){
-        setIdentifier(identifier);
-        this.parameterList = new ArrayList<>();
-        for(Pair<String, NativeTypes> i : parameterList){
-            this.parameterList.add(i);
-        }
-    }
+    // /**
+    //  * Constructor with vararg parameter.
+    //  * @param returnType The returntype of the defined funtction.
+    //  * @param identifier The name of the function.
+    //  * @param parameterList A parameterlist in correct order.
+    //  */
+    // public Function(NativeTypes returnType, String identifier, Pair<String, NativeTypes>... parameterList){
+    //     setIdentifier(identifier);
+    //     this.parameterList = new ArrayList<>();
+    //     for(Pair<String, NativeTypes> i : parameterList){
+    //         this.parameterList.add(i);
+    //     }
+    // }
 
 
     /**
@@ -144,8 +144,9 @@ public class Function{
                 signature.append("V");
                 break;
         }
+        String ret = signature.toString();
 
-        return signature.toString();
+        return ret;
     }
 
     /**
