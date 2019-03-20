@@ -59,7 +59,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             asm.add("new Test");
             asm.add("dup");
             asm.add("invokespecial Test/<init>()V");
-            asm.add("invokevirtual Test/start()V");
+            asm.add("invokevirtual Test/" + PROGRAM_ENTRY.toSignature());
             asm.add("return");
             asm.add(".end method");
 
@@ -281,19 +281,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             .append(".method ")
             .append("public ")
             .append("static ")
-            .append(name)
-            .append("(");
-
-        if(f.equals(PROGRAM_ENTRY)){
-            methodHead.append("[Ljava/lang/String;");
-        } else {
-            methodHead.append((paramcount == 0) ? "V" : "");
-
-            // Append parameters
-            for(int i = 0; i < paramcount; i++){
-                methodHead.append("I");
-            }
-        }
+            .append(f.toSignature());
 
         List<String> functionBody = visit(ctx.function_body());
 
