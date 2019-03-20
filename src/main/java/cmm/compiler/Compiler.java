@@ -27,13 +27,12 @@ public class Compiler{
 
     public static String resolveProgramName(Path inFile){
         String file = inFile.getFileName().toString();
-        int pos = file.lastIndexOf('.');
-        file = file.substring(
-            0,
-            pos != -1 ? pos : file.length()
-        );
-
-        return file;
+        return removeFilenameExtension(file);
+    }
+    
+    private static String removeFilenameExtension(String file) {
+    	int pos = file.lastIndexOf('.');
+    	return file.substring(0, pos != -1 ? pos : file.length());
     }
 
     public void compile(){
@@ -85,9 +84,10 @@ public class Compiler{
         try{
             CmmLexer tmpLex = new CmmLexer(CharStreams.fromPath(input));
             CommonTokenStream tmpTkStream = new CommonTokenStream(tmpLex);
-            CmmParser tmpParser = new CmmParser(tmpTkStream);
-            return tmpParser;
-        } catch (IOException e){
+            return new CmmParser(tmpTkStream);
+        } catch (IOException e) {
+        	System.err.println("Could not create parser from inputfile. Terminating...");
+        	System.exit(2);
             return null;
         }
     }
