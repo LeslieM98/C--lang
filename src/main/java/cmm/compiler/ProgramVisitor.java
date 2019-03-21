@@ -165,52 +165,12 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	return null;
     }
 
-    private int localVarCount(List<String> asm){
-        int num;
-        int max = 0;
-        int pos;
-        String tmp;
-
-        for (String x : asm) {
-            if(x.contains("istore")){
-                tmp = x.trim()
-                    .replaceAll("istore", "")
-                    .trim();
-
-                pos = tmp.indexOf(' ');
-                tmp = tmp.substring(0, pos);
-                num = Integer.parseInt(tmp.trim());
-                Math.max(max, num);
-            }
-
-            if(x.contains("iload")){
-                tmp = x.trim()
-                    .replaceAll("iload", "")
-                    .trim();
-
-                pos = tmp.indexOf(' ');
-                tmp = tmp.substring(0, pos);
-                num = Integer.parseInt(tmp.trim());
-                Math.max(max, num);
-            }
-        }
-
-
-
-        return max + 1;
-    }
-
-
-
-
-
-
 
 
     /**
-     * F:joy function header. Transforms them to a list of identifiers and types.
-     * @:joyill be scanned.
-     * @:joyith their types.
+     * Resolves the type and name of the function parameters.
+     * @param ctx the node of the function header.
+     * @return A list containing all parameters in correct order.
      */
     List<Pair<String, NativeTypes>> determineParameters(Function_headerContext ctx) {
         List<Pair<String, NativeTypes>> result = new ArrayList<>();
@@ -265,8 +225,14 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         scopes.switchContext(f);
 
         // Add parameters as local variables.
-
+        scopes.putVar("this_ptr"); // create this ptr
         params.forEach(x -> scopes.putVar(x.getLeft()));
+
+        // Compile body
+        List<String> functionBody = visit(ctx.function_body());
+
+        // Resolve local variable count
+        int localsCount = scopes.getLocals(f).size();
 
         // Generate Jasmin            
 
@@ -275,15 +241,14 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             .append("public ")
             .append(f.toSignature());
 
-        List<String> functionBody = visit(ctx.function_body());
 
         asm.add(methodHead.toString());
         asm.add(".limit stack " + (functionBody.size()));
-        asm.add(".limit locals " + localVarCount(functionBody));
+        asm.add(".limit locals " + localsCount);
         asm.add("");
 
         asm.addAll(functionBody);
-        asm.add("return");
+        asm.add((f.getReturnType() == NativeTypes.NUM) ? "ireturn" : "return");
 
         asm.add(".end method");
         scopes.switchToGlobalContext();
