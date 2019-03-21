@@ -54,10 +54,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             asm.add(".method public static main([Ljava/lang/String;)V");
             asm.add(".limit stack 20");
             asm.add(".limit locals 1");
-            asm.add("new Test");
+            asm.add("new " + programName);
             asm.add("dup");
-            asm.add("invokespecial Test/<init>()V");
-            asm.add("invokevirtual Test/" + PROGRAM_ENTRY.toSignature());
+            asm.add(String.format("invokespecial %s/<init>()V", programName));
+            asm.add(String.format("invokevirtual %s/%s",programName ,PROGRAM_ENTRY.toSignature()));
             asm.add("return");
             asm.add(".end method");
 
