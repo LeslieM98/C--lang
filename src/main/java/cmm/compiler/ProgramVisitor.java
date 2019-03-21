@@ -425,9 +425,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         notL = "NotBranch" + notCounter;
         doneL = "NotDone" + notCounter;
         notCounter++;
-
-        asm.add("iconst_0");
-        asm.add("isub");
+        
         asm.add("ifeq " + notL);
         asm.add("iconst_0");
         asm.add("goto " + doneL);
