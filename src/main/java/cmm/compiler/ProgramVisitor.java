@@ -299,7 +299,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         List<Pair<ExpressionContext, NativeTypes>> args = determineArguments(ctx);
         List<Pair<String, NativeTypes>> rawArgs = args.stream()
-            .map(x -> new Pair(x.getLeft().getText(), x.getRight()))
+            .map(x -> new Pair<>(x.getLeft().getText(), x.getRight()))
             .collect(Collectors.toList());
 
         NativeTypes returnValue = NativeTypes.VOID;
