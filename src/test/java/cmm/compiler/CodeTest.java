@@ -689,7 +689,7 @@ public class CodeTest{
         assertEquals(expected, runCmm(input));
 
         input = "void main(){if(0){prinln(0);}}";
-        expected = "";
+        expected = null;
         assertEquals(expected, runCmm(input));
     }
 
@@ -776,15 +776,6 @@ public class CodeTest{
 		assertEquals(expected, runCmm(input));
 	}
 	
-	@Test
-	public void testWrongLoop() {
-		String input, expected;
-		input = "void main() {num a; a = 5; loop(0 == a) {println(a);a = a - 1;}}";
-		expected = "5" + System.lineSeparator() + "4" + System.lineSeparator() + "3" + System.lineSeparator() + "2"
-				+ System.lineSeparator() + "1" + System.lineSeparator();
-		assertEquals(expected, runCmm(input));
-	}
-
     public static void main(String[] args) {
         App a = new App();
         String[] arg = {"-j", "test.txt"};

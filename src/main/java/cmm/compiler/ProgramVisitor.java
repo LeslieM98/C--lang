@@ -658,7 +658,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	long loopNum = loopCounter++;
     	asm.add("IfLoop" + loopNum + ":" + System.lineSeparator());
     	asm.addAll(visit(ctx.condition));
-    	asm.add("ifne EndLoop" + loopNum + System.lineSeparator());
+    	asm.add("ifeq EndLoop" + loopNum + System.lineSeparator());
     	asm.addAll(visit(ctx.onTrue));
     	asm.add("goto IfLoop" + loopNum + System.lineSeparator());
     	asm.add("EndLoop" + loopNum + ":" + System.lineSeparator());
