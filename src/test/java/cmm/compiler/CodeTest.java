@@ -690,7 +690,6 @@ public class CodeTest{
         assertEquals(expected, runCmm(input));
     }
 
-    @Disabled
     @Test
     public void testNestedBranches() {
         String input, expected;

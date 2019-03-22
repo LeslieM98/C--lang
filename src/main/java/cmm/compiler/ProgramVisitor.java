@@ -1,7 +1,6 @@
 package cmm.compiler;
 
 import java.util.*;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,7 +21,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
     private final String programName;
     private boolean allreadyAddedClassDef;
-    private int branchDepth;
+    private int branchCounter = 0;
 
     private ScopeManager scopes;
 
@@ -633,22 +632,18 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     @Override
     public List<String> visitBranch(BranchContext ctx) {
         List<String> asm = new ArrayList<>();
+        int branchNum = branchCounter++;
         asm.addAll(visit(ctx.condition)); // evaluate the condition and put it onto the stack
-        asm.add("iconst_0"); // put false value onto the stack
-        asm.add("if_icmpeq label_branch" + branchDepth);
-        asm.addAll(visit(ctx.onTrue));
-        asm.add("goto label_branch" + ++branchDepth);
-        asm.add("label_branch"+ --branchDepth + ":");
+        asm.add("ifne ifTrue" + branchNum + System.lineSeparator());
         if(ctx.onFalse != null) {
-            asm.addAll(visit(ctx.onFalse));
+        	asm.addAll(visit(ctx.onFalse));
         }
-        asm.add("label_branch" + ++branchDepth + ":");
-         // When we have nested if-structures we need to make sure, that there are no
-         // naming conflicts between the labels
-        branchDepth++;
+        asm.add("goto endIf" + branchNum + System.lineSeparator());
+        asm.add("ifTrue" + branchNum + ":" + System.lineSeparator());
+        asm.addAll(visit(ctx.onTrue));
+        asm.add("endIf" + branchNum + ":" + System.lineSeparator());
         return asm;
     }
-
 
     /**
      * @return the definedFunctions
