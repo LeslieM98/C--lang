@@ -1,3 +1,4 @@
+
 # C-- Dokumentation
 ## Grundsätzliches
 Die C-- Sprache beachtet keinen Leerraum. Für den Compiler ist es unerheblich, ob eine bestimmte Einrückung eingehalten wird, oder ob nach dem Abschluss eines Statements durch `;` ein Linefeed-Zeichen gesetzt wird. Natürlich hilft dies jedoch bei der Strukturierung des Programms und wird von den Entwicklern der Sprache wärmstens empfohlen.
@@ -29,6 +30,7 @@ Variablen stellen veränderbare Speicherbereiche dar, die der Programmierer nutz
 
 ## Standard Arithmetik
 Es werden die arithmetischen Operationen `+`, `-`, `*`, `/` für ganzzahlige Datentypen unterstützt. Für die Operation `/` bedeutet dies jedoch, dass keine Rundung vorgenommen wird. Teilt man `5/3` so erhält man nicht, wie vielleicht erwartet, das korrekt gerundete Ergebnis `2`, sondern stets das nach unten abgerundete Ergebnis und damit in diesem Beispiel `1`.
+Bei dem Rechnen mit negativen Zahlen kann es schnell etwas komplizierter werden, da es hier nötig ist negative Literale eigens zu klammern. Aus der Rechnung `5-3` muss dann `5+(-3)` werden.
 
 ## Boolsche Algebra  
 Der Wert `0` entspricht einem Wahrheitswert von Falsch wohingegen alles andere als Wahr aufgefasst wird. Es werden die meisten herkömmlichen Boolschen Operationen unterstützt. In folgender Präzedenzreihenfolge.
@@ -76,3 +78,4 @@ Ein konkretes Beispiel hierzu wäre: Wie kann mein Compiler erkennen dass `num a
 Unser Ansatz ist es eine Klasse einzuführen, die Metadaten der Funktion speichert. In diesem Fall den Identifier, den Returntyp und die Parameter und deren Typen. Diese Metadaten beschreiben die Signatur der Methode und diese Signatur muss innerhalb eines Programms eindeutig sein.
 
 Der ProgrammVisitor hat nun eine Liste von definierten Funktionen, die anfangs leer ist. Sobald eine deklarierte Funktion gefunden wird, wird sie dieser Liste hinzugefügt, sofern nicht bereits eine Funktion mit der gleichen Signatur in dieser Liste vorhanden ist.
+
