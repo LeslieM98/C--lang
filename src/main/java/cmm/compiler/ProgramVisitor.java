@@ -20,6 +20,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
     private final String programName;
     private boolean allreadyAddedClassDef;
+    private int branchDepth;
 
     private ScopeManager scopes;
 
@@ -622,6 +623,26 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	asm.add("imul"); // divide left by right
     	return asm;
     }
+
+    @Override
+    public List<String> visitBranch(BranchContext ctx) {
+        List<String> asm = new ArrayList<>();
+        asm.addAll(visit(ctx.condition)); // evaluate the condition and put it onto the stack
+        asm.add("iconst_0"); // put fals value onto the stack
+        asm.add("if_icmpeq label_branch" + branchDepth);
+        asm.addAll(visit(ctx.onTrue));
+        asm.add("goto label_branch" + ++branchDepth);
+        asm.add("label_branch"+ --branchDepth + ":");
+        if(ctx.onFalse != null) {
+            asm.addAll(visit(ctx.onFalse));
+        }
+        asm.add("label_branch" + ++branchDepth + ":");
+         // When we have nested if-structures we need to make sure, that there are no
+         // naming conflicts between the labels
+        branchDepth++;
+        return asm;
+    }
+
 
     /**
      * @return the definedFunctions

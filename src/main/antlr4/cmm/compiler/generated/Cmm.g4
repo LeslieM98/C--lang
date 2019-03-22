@@ -82,7 +82,7 @@ returnstatement
 
 
 statementList
-    : statement*;
+    : statements=statement*;
 
 variable_declaration
     : dec=generic_variable_declaration #vardec
@@ -95,7 +95,7 @@ function_call
     ;
 
 expression_list
-    : (expressions+=expression (',' expressions+=expression)*)?
+    : expressions+=expression (',' expressions+=expression)*
     ;
 
 assign_operation
