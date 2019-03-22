@@ -255,6 +255,11 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
+    /**
+     * Finds the parent statementcontext of a given context.
+     * @param ctx A context.
+     * @return The parentstatement of ctx or null if not existing.
+     */
     private StatementContext getParentStatement(RuleContext ctx){
         RuleContext parent = ctx.parent;
         if(parent instanceof ProgramContext){
@@ -266,6 +271,11 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return getParentStatement(ctx);
     }
 
+    /**
+     * Determins wether the functioncall is used as void or num return.
+     * @param ctx The called function.
+     * @return true if functions returns a value, false otherwise.
+     */
     private boolean hasReturn(Function_callContext ctx){
         StatementContext stmnt = getParentStatement(ctx);
         if(stmnt == null){
@@ -280,6 +290,11 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return numberOfVarDecs == 1;
     }
 
+    /**
+     * Determines the call arguments of a function call. 
+     * @param ctx the called function
+     * @return A list of Expression, Type pairs containing the arguments in oder from left to right.
+     */
     List<Pair<ExpressionContext, NativeTypes>> determineArguments(Function_callContext ctx){
         List<Pair<ExpressionContext, NativeTypes>> result = new ArrayList<>();
 
@@ -291,8 +306,14 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
 
-
+    /**
+     * Predefined function for printing to stdout.
+     */
     private static final Function SYSOUT = new Function(NativeTypes.VOID, "println", List.of(new Pair("n", NativeTypes.NUM)));
+    /**
+     * If a function call was found this function determines what function was called based on the context. 
+     * It differs between returning/non-returning functions and the parametercount if any
+     */
     @Override
     public List<String> visitFunction_call(Function_callContext ctx) {
         List<String> asm = new ArrayList<>();
