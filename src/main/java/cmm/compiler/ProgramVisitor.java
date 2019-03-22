@@ -573,7 +573,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         Identifier id = scopes.get(ctx.getText());
 
         if(id.getType() == Type.CONSTANT){
-            asm.add(id.getValue());
+            asm.add("ldc " + id.getValue());
         } else {
         	asm.add("iload " + id.getValue());
         }
