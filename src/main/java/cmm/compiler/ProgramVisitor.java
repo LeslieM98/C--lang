@@ -1,7 +1,9 @@
 package cmm.compiler;
 
 import java.util.*;
+import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -188,7 +190,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
 
-    private static final Function PROGRAM_ENTRY = new Function(NativeTypes.VOID, "main", List.of());
+    private static final Function PROGRAM_ENTRY = new Function(NativeTypes.VOID, "main", new ArrayList<>());
     /**
      * Breaks up a function definition into name, return type, parametercount, 
      * parametertypes. Checks wether it is allready defined. Creates a new 
@@ -313,7 +315,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     /**
      * Predefined function for printing to stdout.
      */
-    private static final Function SYSOUT = new Function(NativeTypes.VOID, "println", List.of(new Pair<>("n", NativeTypes.NUM)));
+    private static final Function SYSOUT = new Function(NativeTypes.VOID, "println", Arrays.asList(new Pair<>("n", NativeTypes.NUM)));
     /**
      * If a function call was found this function determines what function was called based on the context. 
      * It differs between returning/non-returning functions and the parametercount if any
