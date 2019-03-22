@@ -21,6 +21,9 @@ src/main/antlr4/cmm/compiler/.antlr
 # Generated Jasmin files
 *.j
 
+# Test Cmm code
+*.txt
+
 # compiled code
 *.class
 *.jar
