@@ -136,11 +136,14 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String name = ctx.dec.variableName.getText();
         String value = ctx.val.getText();
 
-        boolean successfull = true;
+        try{
+            Integer.parseInt(value);
+        } catch (NumberFormatException e){
+            throw new InvalidExpressionException(tk, "Cannot assign expression to constant, it has to be an integer literal");
+        }
 
         // Try to add in global scope
-        scopes.putConstant(name, value);
-
+        boolean successfull = scopes.putConstant(name, value);
 
         if(!successfull){
             throw new AllreadyDefinedException(tk, "Redefinition of constant");

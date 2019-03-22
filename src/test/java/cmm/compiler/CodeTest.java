@@ -225,39 +225,16 @@ public class CodeTest{
 
     @Test
     public void testConstants(){
+        String input, expected;
 
-        // // Test if a single constant does not throw an error.
-        // String inputString = "const num test = 20;";
-        // ParseTree tree = createParser(inputString).program();
-        // ProgramVisitor v = new ProgramVisitor();
-        // try{
-        //     v.visit(tree);
-        // } catch (Exception e){
-        //     Assertions.fail("Exception was thrown" + e.getMessage());
-        // }
+        input = "void main(){const num a = 5;println(a);}";
+        expected = "5" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
 
-        // // Test if 2 different constants with the same identifier throw an error.
-        // boolean exThrown = false;
-        // inputString = "const num test = 20; const num test = 21;";
-        // tree = createParser(inputString).program();
-        // v = new ProgramVisitor();
-        // try{
-        //     v.visit(tree);
-        // } catch (Exception e){
-        //     exThrown = true;
-        // }
-        // Assertions.assertTrue(exThrown);
-
-        // // Test if 2 different constants with different identifiers do not throw an error.
-        // inputString = "const num test = 20; const num test1 = 21;";
-        // tree = createParser(inputString).program();
-        // v = new ProgramVisitor();
-        // try{
-        //     v.visit(tree);
-        // } catch (Exception e){
-        //     Assertions.fail("Exception was thrown" + e.getMessage());
-        // }
-
+        input = "void main(){const num a = 5;println(2 + 2 + 2 + a);}";
+        expected = "11" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+    
     }
 
     @Test
