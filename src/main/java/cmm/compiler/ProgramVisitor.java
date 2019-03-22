@@ -21,7 +21,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
     private final String programName;
     private boolean allreadyAddedClassDef;
-    private int branchCounter = 0;
+    private long branchCounter = 0;
+    private long loopCounter = 0;
 
     private ScopeManager scopes;
 
@@ -151,21 +152,26 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     @Override
     public List<String> visitVardec(VardecContext ctx) {
     	String name = ctx.dec.variableName.getText();
-    	scopes.putVar(name);
-    	return null;
+    	if(!scopes.putVar(name)) {
+    		throw new AllreadyDefinedException(ctx.dec.variableName, "Redefinition of constant");
+    	}
+    	return new ArrayList<>();
     }
     
-
     @Override
-    public List<String> visitVardecassign(VardecassignContext ctx) {
-    	String name = ctx.dec.variableName.getText();
-    	String value = ctx.val.getText();
-    	
-
-    	
-    	return null;
+    public List<String> visitAssign_operation(Assign_operationContext ctx) {
+    	List<String> asm = new ArrayList<>();
+    	Identifier var = scopes.get(ctx.variableName.getText());
+    	if (var.getType() == Type.CONSTANT) {
+    		throw new AllreadyDefinedException(ctx.variableName, "Redefinition of constant");
+    	}
+    	asm.addAll(visit(ctx.expr));
+    	asm.add("istore " + var.getValue());
+    	return asm;
     }
-
+    
+   
+    
 
 
     /**
@@ -569,14 +575,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         if(id.getType() == Type.CONSTANT){
             asm.add(id.getValue());
         } else {
-
+        	asm.add("iload " + id.getValue());
         }
-
-
-
-
-
-
         return asm;
     }
 
@@ -632,7 +632,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     @Override
     public List<String> visitBranch(BranchContext ctx) {
         List<String> asm = new ArrayList<>();
-        int branchNum = branchCounter++;
+        long branchNum = branchCounter++;
         asm.addAll(visit(ctx.condition)); // evaluate the condition and put it onto the stack
         asm.add("ifne ifTrue" + branchNum + System.lineSeparator());
         if(ctx.onFalse != null) {
@@ -644,7 +644,22 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.add("endIf" + branchNum + ":" + System.lineSeparator());
         return asm;
     }
+    
+    @Override
+    public List<String> visitLoop(LoopContext ctx) {
+    	List<String> asm = new ArrayList<>();
+    	long loopNum = loopCounter++;
+    	asm.add("IfLoop" + loopNum + ":" + System.lineSeparator());
+    	asm.addAll(visit(ctx.condition));
+    	asm.add("ifne EndLoop" + loopNum + System.lineSeparator());
+    	asm.addAll(visit(ctx.onTrue));
+    	asm.add("goto IfLoop" + loopNum + System.lineSeparator());
+    	asm.add("EndLoop" + loopNum + System.lineSeparator());
+    	return asm;
+    }
 
+    
+    
     /**
      * @return the definedFunctions
      */
