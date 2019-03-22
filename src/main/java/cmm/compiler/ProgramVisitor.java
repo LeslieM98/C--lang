@@ -60,9 +60,6 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             asm.add(String.format("invokevirtual %s/%s",programName ,PROGRAM_ENTRY.toSignature()));
             asm.add("return");
             asm.add(".end method");
-
-            // Main Method
-            asm.add(System.lineSeparator());
             allreadyAddedClassDef = true;
         }
 
@@ -280,10 +277,6 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             .collect(Collectors.toList());
 
         Function f = new Function(NativeTypes.NUM, ctx.IDENTIFIER().getText(), rawArgs);
-
-        if(!definedFunctions.contains(f)){
-            throw new UndefinedSymbolException(ctx.IDENTIFIER().getSymbol(), "Could not resolve function call");
-        }
 
         StringBuilder functionCall = new StringBuilder("invokevirtual ");
             
@@ -576,5 +569,12 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	asm.addAll(visit(ctx.right)); // evaluate right expression onto the stack
     	asm.add("imul"); // divide left by right
     	return asm;
+    }
+
+    /**
+     * @return the definedFunctions
+     */
+    public List<Function> getDefinedFunctions() {
+        return definedFunctions;
     }
 }
