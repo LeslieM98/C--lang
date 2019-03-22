@@ -577,6 +577,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         } else {
         	asm.add("iload " + id.getValue());
         }
+
+
+
+
         return asm;
     }
 
@@ -654,7 +658,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	asm.add("ifne EndLoop" + loopNum + System.lineSeparator());
     	asm.addAll(visit(ctx.onTrue));
     	asm.add("goto IfLoop" + loopNum + System.lineSeparator());
-    	asm.add("EndLoop" + loopNum + System.lineSeparator());
+    	asm.add("EndLoop" + loopNum + ":" + System.lineSeparator());
     	return asm;
     }
 
