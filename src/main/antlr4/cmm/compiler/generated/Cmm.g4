@@ -91,11 +91,11 @@ variable_declaration
     ;
 
 function_call
-    : functionName=IDENTIFIER '(' arguments=expression_list ')'
+    : functionName=IDENTIFIER '(' (expression_list)? ')'
     ;
 
 expression_list
-    : expressions+=expression (',' expressions+=expression)*
+    : (expressions+=expression (',' expressions+=expression)*)
     ;
 
 assign_operation

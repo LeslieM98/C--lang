@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.tree.*;
 import java.util.*;
 
 import cmm.compiler.generated.*;
+import cmm.compiler.utillity.FunctionCallValidator;
 
 public class Compiler{
 
@@ -38,7 +39,22 @@ public class Compiler{
     public void compile(){
         ParseTree pt = createParser(infile).program();
         ProgramVisitor v = new ProgramVisitor(programname);
+        
+        
         List<String> asm = v.visit(pt);
+
+        // Validating
+        FunctionCallValidator fcv = new FunctionCallValidator(
+            asm, 
+            ((ProgramVisitor) v).getDefinedFunctions()
+        );
+        
+        List<String> errors = fcv.validate();
+        if(!errors.isEmpty()){
+            errors.forEach(System.err::println);
+            return;
+        }
+
         if(generateJasmin){
             writeJasmin(asm);
         } else {
@@ -92,6 +108,9 @@ public class Compiler{
         }
     }
 
+    /**
+     * Validates the code and throws corresponding exceptions if anything is not working correctly.
+     */
 
 
 }

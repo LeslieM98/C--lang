@@ -3,6 +3,7 @@ package cmm.compiler;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -260,7 +261,7 @@ public class CodeTest{
 
 
         /* Test if local constants returns correct values. */
-        Function f1 = new Function(NativeTypes.VOID, "foo", new Pair<>("a", NativeTypes.NUM));
+        Function f1 = new Function(NativeTypes.VOID, "foo", List.of(new Pair<String, NativeTypes>("a", NativeTypes.NUM)));
         s.createLocalScope(f1);
         s.switchContext(f1);
         assertEquals(Scope.LOCAL, s.currentScope());
@@ -390,7 +391,7 @@ public class CodeTest{
 
         /* test if scopes of 2 functions don't crash */
         s.switchToGlobalContext();
-        Function f2 = new Function(NativeTypes.VOID, "foo");
+        Function f2 = new Function(NativeTypes.VOID, "foo", List.of());
         s.createLocalScope(f2);
         s.switchContext(f2);
 
@@ -497,19 +498,22 @@ public class CodeTest{
 
     @Test
     public void testNot(){
-        String input, expected;
+        String input, expected, actual;
 
         input = "void main(){println(!0);}";
         expected = "1" + System.lineSeparator();
-        assertEquals(expected, runCmm(input));
+        actual = runCmm(input);
+        assertEquals(expected, actual);
 
         input = "void main(){println(!1);}";
         expected = "0" + System.lineSeparator();
-        assertEquals(expected, runCmm(input));
+        actual = runCmm(input);
+        assertEquals(expected, actual);
 
         input = "void main(){println(!20);}";
         expected = "0" + System.lineSeparator();
-        assertEquals(expected, runCmm(input));
+        actual = runCmm(input);
+        assertEquals(expected, actual);
 
 
     }
@@ -692,6 +696,53 @@ public class CodeTest{
         expected = "1"+System.lineSeparator()+"0"+System.lineSeparator()+"1"+System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
+    }
+
+
+    @Test
+    public void testFunctionCalls() {
+        final String ls = System.lineSeparator();
+        String input, expected, actual;
+
+        // Overloading
+        input = String.format("%s%s%s%s",
+            "void main(){a();a(2);a(2,2);}",
+            "void a(){println(1);}",
+            "void a(num a){println(2);}",
+            "void a(num a, num b){println(3);}"
+        );
+        expected = String.format("%d%s%d%s%d%s", 1, ls, 2, ls, 3, ls);
+        actual = runCmm(input);
+        assertEquals(expected, actual);
+
+        // Call non existing method
+        input = "void main(){a();a(2);a(2,2);}";
+        actual = runCmm(input);
+        assertNull(actual);
+
+        // Functions with different names
+        input = String.format("%s%s%s%s",
+            "void main(){a();b();c();}",
+            "void a(){println(1);}",
+            "void b(){println(2);}",
+            "void c(){println(3);}"
+        );
+        expected = String.format("%d%s%d%s%d%s", 1, ls, 2, ls, 3, ls);
+        actual = runCmm(input);
+        assertEquals(expected, actual);
+
+        // Overloading + functions with different names
+        input = String.format("%s%s%s%s",
+            "void main(){a();b();a(1);b(2);}",
+            "void a(){println(1);}",
+            "void a(num a){println(2);}",
+            "void b(){println(3);}",
+            "void b(num a){println(4);}"
+        );
+        expected = String.format("%d%s%d%s%d%s%d%s", 1, ls, 3, ls, 2, ls, 4, ls);
+        actual = runCmm(input);
+        assertEquals(expected, actual);
+        
     }
 
     public static void main(String[] args) {

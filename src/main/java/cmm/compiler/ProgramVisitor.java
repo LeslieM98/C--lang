@@ -1,7 +1,10 @@
 package cmm.compiler;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -31,9 +34,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         definedFunctions = new ArrayList<>();
         this.programName = programName;
         allreadyAddedClassDef = false;
-
-        // specific countervars for visit functions
-        // eqCounter = 0;
+        definedFunctions.add(SYSOUT);
     }
 
     @Override
@@ -41,9 +42,27 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         List<String> asm = new ArrayList<>();
 
         if(!allreadyAddedClassDef){
+            // Inheritance and def
             asm.add(".class public " + programName);
             asm.add(".super java/lang/Object");
-            asm.add(System.lineSeparator());
+
+            // Default ctor
+            asm.add(".method public <init>()V");
+            asm.add("aload_0");
+            asm.add("invokespecial java/lang/Object/<init>()V");
+            asm.add("return");
+            asm.add(".end method");
+
+            // Program entry
+            asm.add(".method public static main([Ljava/lang/String;)V");
+            asm.add(".limit stack 20");
+            asm.add(".limit locals 1");
+            asm.add("new " + programName);
+            asm.add("dup");
+            asm.add(String.format("invokespecial %s/<init>()V", programName));
+            asm.add(String.format("invokevirtual %s/%s",programName ,PROGRAM_ENTRY.toSignature()));
+            asm.add("return");
+            asm.add(".end method");
             allreadyAddedClassDef = true;
         }
 
@@ -146,43 +165,30 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	return null;
     }
 
-    private int localVarCount(List<String> asm){
-        int num;
-        int max = 0;
-        int pos;
-        String tmp;
 
-        for (String x : asm) {
-            if(x.contains("istore")){
-                tmp = x.trim()
-                    .replaceAll("istore", "")
-                    .trim();
 
-                pos = tmp.indexOf(' ');
-                tmp = tmp.substring(0, pos);
-                num = Integer.parseInt(tmp.trim());
-                Math.max(max, num);
-            }
+    /**
+     * Resolves the type and name of the function parameters.
+     * @param ctx the node of the function header.
+     * @return A list containing all parameters in correct order.
+     */
+    List<Pair<String, NativeTypes>> determineParameters(Function_headerContext ctx) {
+        List<Pair<String, NativeTypes>> result = new ArrayList<>();
+        
+        List<Generic_variable_declarationContext> paramDecs = ctx.children.stream().
+            filter(x -> x instanceof Generic_variable_declarationContext).
+            map(x -> (Generic_variable_declarationContext) x).
+            collect(Collectors.toList());
 
-            if(x.contains("iload")){
-                tmp = x.trim()
-                    .replaceAll("iload", "")
-                    .trim();
-
-                pos = tmp.indexOf(' ');
-                tmp = tmp.substring(0, pos);
-                num = Integer.parseInt(tmp.trim());
-                Math.max(max, num);
-            }
+        for (Generic_variable_declarationContext x : paramDecs) {
+            result.add(new Pair<String,NativeTypes>(x.IDENTIFIER().getText(), NativeTypes.NUM));
         }
 
-
-
-        return max + 1;
+        return result;
     }
 
 
-    private static final Function PROGRAM_ENTRY = new Function(NativeTypes.VOID, "main");
+    private static final Function PROGRAM_ENTRY = new Function(NativeTypes.VOID, "main", List.of());
     /**
      * Breaks up a function definition into name, return type, parametercount, 
      * parametertypes. Checks wether it is allready defined. Creates a new 
@@ -206,35 +212,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String name = ctx.function_header().functionName.getText();
         NativeTypes retType = toNativeTypes(ctx.function_header().ret.getText());
 
-        // Determine parametercount
-        int paramcount = ctx.function_header().getChildCount();
-        paramcount -= 4; // - num, name, (, )
-        paramcount -= paramcount/2; // Extract ',' count
-
         // Determine parameters
-        List<Pair<String, NativeTypes>> params = new ArrayList<>();
-        Pair<String, NativeTypes> tmpPair;
-        Generic_variable_declarationContext c;
-        for(int i = 0; i/2 < paramcount; i+=2){
-            c = ctx.function_header().getChild(Generic_variable_declarationContext.class, 3 + i);
-
-            tmpPair = new Pair<>(
-                c.variableName.getText(),
-                toNativeTypes(c.TYPE().getText())
-            );
-
-            if(params.contains(tmpPair)){
-                throw new AllreadyDefinedException(c.variableName, "Param allready defined");
-            }
-
-            
-
-            params.add(new Pair<>(
-                c.variableName.getText(),
-                toNativeTypes(c.TYPE().getText())
-                
-            ));
-        }
+        List<Pair<String, NativeTypes>> params = determineParameters(ctx.function_header());
 
         // Assemble function
         Function f = new Function(retType, name, params);
@@ -246,41 +225,30 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         scopes.switchContext(f);
 
         // Add parameters as local variables.
-
+        scopes.putVar("this_ptr"); // create this ptr
         params.forEach(x -> scopes.putVar(x.getLeft()));
+
+        // Compile body
+        List<String> functionBody = visit(ctx.function_body());
+
+        // Resolve local variable count
+        int localsCount = scopes.getLocals(f).size();
 
         // Generate Jasmin            
 
         StringBuilder methodHead = new StringBuilder()
             .append(".method ")
             .append("public ")
-            .append("static ")
-            .append(name)
-            .append("(");
+            .append(f.toSignature());
 
-        if(f.equals(PROGRAM_ENTRY)){
-            methodHead.append("[Ljava/lang/String;");
-        } else {
-            methodHead.append((paramcount == 0) ? "V" : "");
-
-            // Append parameters
-            for(int i = 0; i < paramcount; i++){
-                methodHead.append("I");
-            }
-        }
-
-        List<String> functionBody = visit(ctx.function_body());
-
-        methodHead.append(")")
-            .append((f.getReturnType() == NativeTypes.VOID) ? "V" : "D");
 
         asm.add(methodHead.toString());
         asm.add(".limit stack " + (functionBody.size()));
-        asm.add(".limit locals " + localVarCount(functionBody));
+        asm.add(".limit locals " + localsCount);
         asm.add("");
 
         asm.addAll(functionBody);
-        asm.add("return");
+        asm.add((f.getReturnType() == NativeTypes.NUM) ? "ireturn" : "return");
 
         asm.add(".end method");
         scopes.switchToGlobalContext();
@@ -288,25 +256,109 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
+    /**
+     * Finds the parent statementcontext of a given context.
+     * @param ctx A context.
+     * @return The parentstatement of ctx or null if not existing.
+     */
+    private StatementContext getParentStatement(RuleContext ctx){
+        RuleContext parent = ctx.parent;
+        if(parent instanceof ProgramContext){
+            return null;
+        }
+        if(parent instanceof StatementContext){
+            return (StatementContext) parent;
+        }
+        return getParentStatement(ctx);
+    }
+
+    /**
+     * Determins wether the functioncall is used as void or num return.
+     * @param ctx The called function.
+     * @return true if functions returns a value, false otherwise.
+     */
+    private boolean hasReturn(Function_callContext ctx){
+        StatementContext stmnt = getParentStatement(ctx);
+        if(stmnt == null){
+            return false;
+        }
+
+        long numberOfVarDecs =  ctx.children
+            .stream()
+            .filter(x -> x instanceof Variable_declarationContext)
+            .count();
+
+        return numberOfVarDecs == 1;
+    }
+
+    /**
+     * Determines the call arguments of a function call. 
+     * @param ctx the called function
+     * @return A list of Expression, Type pairs containing the arguments in oder from left to right.
+     */
+    List<Pair<ExpressionContext, NativeTypes>> determineArguments(Function_callContext ctx){
+        List<Pair<ExpressionContext, NativeTypes>> result = new ArrayList<>();
+
+        Expression_listContext args = ctx.expression_list();
+        if(args != null){
+            for (ExpressionContext x : ctx.expression_list().expressions) {
+                result.add(new Pair<>(x, NativeTypes.NUM));
+            }
+        }
+        
+        return result;
+    }
+
+
+    /**
+     * Predefined function for printing to stdout.
+     */
+    private static final Function SYSOUT = new Function(NativeTypes.VOID, "println", List.of(new Pair<>("n", NativeTypes.NUM)));
+    /**
+     * If a function call was found this function determines what function was called based on the context. 
+     * It differs between returning/non-returning functions and the parametercount if any
+     */
     @Override
     public List<String> visitFunction_call(Function_callContext ctx) {
-        String functionName = ctx.functionName.getText();
         List<String> asm = new ArrayList<>();
-        if ("println".equals(functionName)) {
-            asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
-            String toPrint = ctx.arguments.expression.getText();
-            asm.addAll(visit(ctx.arguments.expression)); // rather let the parser do all work instead of doing it by hand.
-            // double value;
-            // try {
-            //     value = Double.valueOf(toPrint);
-            //     asm.add("ldc2_w " + value);
-            // } catch(NumberFormatException e) {
-            //     Pair<Type, Integer> varToLoad = scopes.get(toPrint);
-            //     asm.add("iload " + varToLoad.getRight());
-            // }
-            asm.add("invokevirtual java/io/PrintStream/println(I)V");    
+
+        List<Pair<ExpressionContext, NativeTypes>> args = determineArguments(ctx);
+        List<Pair<String, NativeTypes>> rawArgs = args.stream()
+            .filter(x -> !x.getLeft().getText().trim().isEmpty())
+            .map(x -> new Pair<>(x.getLeft().getText(), x.getRight()))
+            .collect(Collectors.toList());
+
+        NativeTypes returnValue = NativeTypes.VOID;
+        if(hasReturn(ctx)){
+            returnValue = NativeTypes.NUM;
         }
-        asm.add(System.lineSeparator());
+
+        Function f = new Function(returnValue, ctx.IDENTIFIER().getText(), rawArgs);
+
+        StringBuilder functionCall = new StringBuilder("invokevirtual ");
+            
+        if(f.equals(SYSOUT)){
+            functionCall.append("java/io/PrintStream/println(I)V");
+            asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
+        } else {
+            functionCall
+                .append(programName + "/")
+                .append(f.toSignature());
+            asm.add("aload_0"); // push this ptr
+        }
+        
+
+
+        asm.addAll(
+            args.stream()
+                .map(Pair::getLeft)
+                .map(this::visit)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList())
+        );
+        asm.add(functionCall.toString());
+        
+
         return asm;
     }
 
@@ -388,9 +440,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         notL = "NotBranch" + notCounter;
         doneL = "NotDone" + notCounter;
         notCounter++;
-
-        asm.add("iconst_0");
-        asm.add("isub");
+        
         asm.add("ifeq " + notL);
         asm.add("iconst_0");
         asm.add("goto " + doneL);
@@ -595,5 +645,13 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
          // naming conflicts between the labels
         branchDepth++;
         return asm;
+    }
+
+
+    /**
+     * @return the definedFunctions
+     */
+    public List<Function> getDefinedFunctions() {
+        return definedFunctions;
     }
 }

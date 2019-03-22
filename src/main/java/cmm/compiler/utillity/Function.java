@@ -36,19 +36,19 @@ public class Function{
         returnType = NativeTypes.VOID;
     }
 
-    /**
-     * Constructor with vararg parameter.
-     * @param returnType The returntype of the defined funtction.
-     * @param identifier The name of the function.
-     * @param parameterList A parameterlist in correct order.
-     */
-    public Function(NativeTypes returnType, String identifier, Pair<String, NativeTypes>... parameterList){
-        setIdentifier(identifier);
-        this.parameterList = new ArrayList<>();
-        for(Pair<String, NativeTypes> i : parameterList){
-            this.parameterList.add(i);
-        }
-    }
+    // /**
+    //  * Constructor with vararg parameter.
+    //  * @param returnType The returntype of the defined funtction.
+    //  * @param identifier The name of the function.
+    //  * @param parameterList A parameterlist in correct order.
+    //  */
+    // public Function(NativeTypes returnType, String identifier, Pair<String, NativeTypes>... parameterList){
+    //     setIdentifier(identifier);
+    //     this.parameterList = new ArrayList<>();
+    //     for(Pair<String, NativeTypes> i : parameterList){
+    //         this.parameterList.add(i);
+    //     }
+    // }
 
 
     /**
@@ -112,6 +112,41 @@ public class Function{
      */
     public Pair<String, NativeTypes> getParameter(int i){
         return parameterList.get(i);
+    }
+
+    /**
+     * Returns a representation that can be used in JVM ASM.
+     * Example Test(II)V
+     * @return the representaton
+     */
+    public String toSignature(){
+        StringBuilder signature = new StringBuilder(identifier)
+            .append("(");
+
+        if(getParameterCount() != 0){
+            for (Pair<String, NativeTypes> x : parameterList) {
+                switch (x.getRight()) {
+                    case NUM:
+                        signature.append("I");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        signature.append(")");
+        
+        switch (returnType) {
+            case NUM:
+                signature.append("I");
+                break;
+            case VOID:
+                signature.append("V");
+                break;
+        }
+        String ret = signature.toString();
+
+        return ret;
     }
 
     /**

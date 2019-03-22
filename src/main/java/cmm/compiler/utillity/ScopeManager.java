@@ -1,6 +1,7 @@
 package cmm.compiler.utillity;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class exists for the purpose of managing variable/constants 
@@ -127,6 +128,7 @@ public class ScopeManager {
 
         localConstantScopes.putIfAbsent(f, new HashMap<>());
         localVariableScopes.putIfAbsent(f, new HashMap<>());
+        
         return true;
     }
 
@@ -354,6 +356,23 @@ public class ScopeManager {
             return Scope.LOCAL;
         }
         return Scope.TEMPORARY;
+    }
+
+    /**
+     * Returns all locals of a function.
+     * @param f The function
+     * @return A List containing each local variable.
+     */
+    public List<Identifier> getLocals(Function f){
+        Map<String, Integer> variableScope =  localVariableScopes.get(f);
+        
+        List<Identifier> locals = variableScope
+            .keySet()
+            .stream()
+            .map(x -> new Identifier(Scope.LOCAL, Type.VARIABLE, x, variableScope.get(x).toString()))
+            .collect(Collectors.toList());
+
+        return locals;
     }
 
 
