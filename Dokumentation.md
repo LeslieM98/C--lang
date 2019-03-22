@@ -71,7 +71,7 @@ Mehrere Variablen mit gleichen Namen sind erlaubt. Unser Ansatz ist es, einen Sc
 Es ist bei mehrfach Deklarationen jedoch nur möglich auf die Variable des innersten zugrunde liegenden Scopes zuzugreifen. 
 
 ## Funktionen
-### Wie unterscheidet man mehrere funktionen, bei erlaubtem Overloading?
+### Wie unterscheidet man mehrere Funktionen, bei erlaubtem Overloading?
 Ein konkretes Beispiel hierzu wäre: Wie kann mein Compiler erkennen dass `num add(num a, num b)` und `num add(num a, num b, num c)` Grund auf verschiedene Funktionen sind?
 Unser Ansatz ist es eine Klasse einzuführen, die Metadaten der Funktion speichert. In diesem Fall den Identifier, den Returntyp und die Parameter und deren Typen. Diese Metadaten beschreiben die Signatur der Methode und diese Signatur muss innerhalb eines Programms eindeutig sein.
 
