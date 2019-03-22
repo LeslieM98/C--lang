@@ -799,6 +799,18 @@ public class CodeTest{
 		assertEquals(expected, runCmm(input));
 	}
 	
+	@Test
+	public void testParenthesis() {
+		String input, expected;
+		input = "void main() {println((5+3)*2);}";
+		expected = "16" + System.lineSeparator();
+		assertEquals(expected, runCmm(input));
+		
+		input = "void main() {println((5+(-6))*2);}";
+		expected = "-2" + System.lineSeparator();
+		assertEquals(expected, runCmm(input));
+	}
+	
     public static void main(String[] args) {
         App a = new App();
         String[] arg = {"-j", "test.txt"};
