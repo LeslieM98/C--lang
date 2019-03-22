@@ -60,12 +60,22 @@ public class CodeTest{
      */
     private static String runJasmin(Path source){
         List<String> asm;
+        String fileName = source.toString().replace(".cmm", ".j");
+        Path jFile = Paths.get(fileName);
         try{
-            asm = Files.readAllLines(source);
+            asm = Files.readAllLines(jFile);
         } catch (IOException e){
             asm = new ArrayList<>();
         }
-        return runJasmin(String.join("", asm));
+
+        try{
+            Files.delete(jFile);
+        } catch (IOException e){
+
+        }
+        String code = String.join(System.lineSeparator(), asm);
+        String result = runJasmin(code);
+        return result;
     }
 
     /**
@@ -123,12 +133,28 @@ public class CodeTest{
      * @return Everything printed to System.out while the code was running.
      */
     public static String runCmm(String source){
-        ParseTree tree = createParser(source).program();
-        ProgramVisitor v = new ProgramVisitor("TestAsm");
-        
-        String asm = String.join(System.lineSeparator(), v.visit(tree));   
 
-        String output = runJasmin(asm);
+        // ParseTree tree = createParser(source).program();
+        // ProgramVisitor v = new ProgramVisitor("TestAsm");
+        
+        // String asm = String.join(System.lineSeparator(), v.visit(tree));   
+
+        // String output = runJasmin(asm);
+
+        Path srcPath = Paths.get("TestAsm.cmm");
+        try {
+            Files.write(srcPath, source.getBytes(), StandardOpenOption.CREATE_NEW);
+        } catch (IOException e) {
+            return "File not accessible";
+        }
+
+        String output = runCmm(srcPath);
+
+        try {
+            Files.delete(srcPath);
+        } catch(IOException e){
+            
+        }
 
         return output;
     }
@@ -140,10 +166,8 @@ public class CodeTest{
      * @return Everything printed to System.out while the code was running.
      */
     public static String runCmm(Path source){
-        ParseTree tree = createParser(source).program();
-        ProgramVisitor v = new ProgramVisitor("TestAsm");
-        
-        String asm = String.join(System.lineSeparator(), v.visit(tree));   
+        Compiler cmp = new Compiler(source, true);
+        cmp.compile();
 
         String output = runJasmin(source);
 
