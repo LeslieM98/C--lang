@@ -299,8 +299,11 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     List<Pair<ExpressionContext, NativeTypes>> determineArguments(Function_callContext ctx){
         List<Pair<ExpressionContext, NativeTypes>> result = new ArrayList<>();
 
-        for (ExpressionContext x : ctx.expression_list().expressions) {
-            result.add(new Pair(x, NativeTypes.NUM));
+        Expression_listContext args = ctx.expression_list();
+        if(args != null){
+            for (ExpressionContext x : ctx.expression_list().expressions) {
+                result.add(new Pair<>(x, NativeTypes.NUM));
+            }
         }
         
         return result;
@@ -310,7 +313,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     /**
      * Predefined function for printing to stdout.
      */
-    private static final Function SYSOUT = new Function(NativeTypes.VOID, "println", List.of(new Pair("n", NativeTypes.NUM)));
+    private static final Function SYSOUT = new Function(NativeTypes.VOID, "println", List.of(new Pair<>("n", NativeTypes.NUM)));
     /**
      * If a function call was found this function determines what function was called based on the context. 
      * It differs between returning/non-returning functions and the parametercount if any
@@ -321,6 +324,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         List<Pair<ExpressionContext, NativeTypes>> args = determineArguments(ctx);
         List<Pair<String, NativeTypes>> rawArgs = args.stream()
+            .filter(x -> !x.getLeft().getText().trim().isEmpty())
             .map(x -> new Pair<>(x.getLeft().getText(), x.getRight()))
             .collect(Collectors.toList());
 

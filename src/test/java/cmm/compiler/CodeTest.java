@@ -3,6 +3,7 @@ package cmm.compiler;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -695,6 +696,53 @@ public class CodeTest{
         expected = "1"+System.lineSeparator()+"0"+System.lineSeparator()+"1"+System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
+    }
+
+
+    @Test
+    public void testFunctionCalls() {
+        final String ls = System.lineSeparator();
+        String input, expected, actual;
+
+        // Overloading
+        input = String.format("%s%s%s%s",
+            "void main(){a();a(2);a(2,2);}",
+            "void a(){println(1);}",
+            "void a(num a){println(2);}",
+            "void a(num a, num b){println(3);}"
+        );
+        expected = String.format("%d%s%d%s%d%s", 1, ls, 2, ls, 3, ls);
+        actual = runCmm(input);
+        assertEquals(expected, actual);
+
+        // Call non existing method
+        input = "void main(){a();a(2);a(2,2);}";
+        actual = runCmm(input);
+        assertNull(actual);
+
+        // Functions with different names
+        input = String.format("%s%s%s%s",
+            "void main(){a();b();c();}",
+            "void a(){println(1);}",
+            "void b(){println(2);}",
+            "void c(){println(3);}"
+        );
+        expected = String.format("%d%s%d%s%d%s", 1, ls, 2, ls, 3, ls);
+        actual = runCmm(input);
+        assertEquals(expected, actual);
+
+        // Overloading + functions with different names
+        input = String.format("%s%s%s%s",
+            "void main(){a();b();a(1);b(2);}",
+            "void a(){println(1);}",
+            "void a(num a){println(2);}",
+            "void b(){println(3);}",
+            "void b(num a){println(4);}"
+        );
+        expected = String.format("%d%s%d%s%d%s%d%s", 1, ls, 3, ls, 2, ls, 4, ls);
+        actual = runCmm(input);
+        assertEquals(expected, actual);
+        
     }
 
     public static void main(String[] args) {
