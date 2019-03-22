@@ -582,7 +582,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     public List<String> visitBranch(BranchContext ctx) {
         List<String> asm = new ArrayList<>();
         asm.addAll(visit(ctx.condition)); // evaluate the condition and put it onto the stack
-        asm.add("iconst_0"); // put fals value onto the stack
+        asm.add("iconst_0"); // put false value onto the stack
         asm.add("if_icmpeq label_branch" + branchDepth);
         asm.addAll(visit(ctx.onTrue));
         asm.add("goto label_branch" + ++branchDepth);
