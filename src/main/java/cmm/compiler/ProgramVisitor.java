@@ -3,6 +3,8 @@ package cmm.compiler;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -253,6 +255,30 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
+    private StatementContext getParentStatement(RuleContext ctx){
+        RuleContext parent = ctx.parent;
+        if(parent instanceof ProgramContext){
+            return null;
+        }
+        if(parent instanceof StatementContext){
+            return (StatementContext) parent;
+        }
+        return getParentStatement(ctx);
+    }
+
+    private boolean hasReturn(Function_callContext ctx){
+        StatementContext stmnt = getParentStatement(ctx);
+        if(stmnt == null){
+            return false;
+        }
+
+        long numberOfVarDecs =  ctx.children
+            .stream()
+            .filter(x -> x instanceof Variable_declarationContext)
+            .count();
+
+        return numberOfVarDecs == 1;
+    }
 
     List<Pair<ExpressionContext, NativeTypes>> determineArguments(Function_callContext ctx){
         List<Pair<ExpressionContext, NativeTypes>> result = new ArrayList<>();
@@ -276,7 +302,12 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             .map(x -> new Pair(x.getLeft().getText(), x.getRight()))
             .collect(Collectors.toList());
 
-        Function f = new Function(NativeTypes.NUM, ctx.IDENTIFIER().getText(), rawArgs);
+        NativeTypes returnValue = NativeTypes.VOID;
+        if(hasReturn(ctx)){
+            returnValue = NativeTypes.NUM;
+        }
+
+        Function f = new Function(returnValue, ctx.IDENTIFIER().getText(), rawArgs);
 
         StringBuilder functionCall = new StringBuilder("invokevirtual ");
             
