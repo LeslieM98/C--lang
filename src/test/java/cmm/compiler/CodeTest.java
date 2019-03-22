@@ -642,6 +642,9 @@ public class CodeTest {
 		input = "void main(){println(6 / 2);}";
 		expected = "3" + System.lineSeparator();
 		assertEquals(expected, runCmm(input));
+		
+		input = "void main(){println(7 / 2);}";
+		assertEquals(expected, runCmm(input));
 	}
 
 	@Test
