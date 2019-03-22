@@ -791,19 +791,16 @@ public class CodeTest{
 	@Test
 	public void testLoop() {
 		String input, expected;
-		input = "void main() {num a; a = 5; loop(0 != a) {println(a);a = a - 1;}";
+		input = "void main() {num a; a = 5; loop(0 != a) {println(a);a = a - 1;}}";
 		expected = "5" + System.lineSeparator() + "4" + System.lineSeparator() + "3" + System.lineSeparator() + "2"
 				+ System.lineSeparator() + "1" + System.lineSeparator();
-		assertEquals(expected, runCmm(input));
-		
-		input = "void main() {num a; a = 5; loop(0 == a) {println(a);a = a - 1;}";
 		assertEquals(expected, runCmm(input));
 	}
 	
 	@Test
 	public void testWrongLoop() {
 		String input, expected;
-		input = "void main() {num a; a = 5; loop(0 == a) {println(a);a = a - 1;}";
+		input = "void main() {num a; a = 5; loop(0 == a) {println(a);a = a - 1;}}";
 		expected = "5" + System.lineSeparator() + "4" + System.lineSeparator() + "3" + System.lineSeparator() + "2"
 				+ System.lineSeparator() + "1" + System.lineSeparator();
 		assertEquals(expected, runCmm(input));
