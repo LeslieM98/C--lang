@@ -703,7 +703,6 @@ public class CodeTest{
 
     }
 
-    @Disabled
     @Test
     public void testFunctionCalls() {
         final String ls = System.lineSeparator();
@@ -737,7 +736,7 @@ public class CodeTest{
         assertEquals(expected, actual);
 
         // Overloading + functions with different names
-        input = String.format("%s%s%s%s",
+        input = String.format("%s%s%s%s%s",
             "void main(){a();b();a(1);b(2);}",
             "void a(){println(1);}",
             "void a(num a){println(2);}",
