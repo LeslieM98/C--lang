@@ -661,7 +661,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         List<String> asm = new ArrayList<>();
         long branchNum = branchCounter++;
         asm.addAll(visit(ctx.condition));
-        asm.add("ifne endIf" + branchNum);
+        asm.add("ifeq endIf" + branchNum);
         asm.addAll(visit(ctx.onTrue));
         asm.add("endIf" + branchNum + ":");
         return asm;
@@ -689,6 +689,17 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	return asm;
     }
 
+    @Override
+    public List<String> visitReturnstatement(ReturnstatementContext ctx) {
+        List<String> asm = new ArrayList<>();
+        if(ctx.returnValue == null){
+            asm.add("return");
+        } else {
+            asm.addAll(visit(ctx.returnValue));
+            asm.add("ireturn");
+        }
+        return asm;
+    }
 
     
     
