@@ -43,21 +43,38 @@ public class FunctionCallValidator {
         
         for(int i = 0; i < asm.size(); i++){
             String line = asm.get(i);
-            if(!isMethodCall(line)){
-                continue;
+            if(isMethodCall(line)){
+                String signature =  toSignature(line);
+            
+                if(!funSignatures.contains(signature)){
+                    String method = getSurroundingMethodSignature(i);
+                    errors.add(String.format("Undefined call to (%s) in method (%s)", signature, method));
+                }
+            } else {
+                if(isMethodDef(line)){
+                    if(line.contains("println(I)V") || line.contains("get()I")){
+                        i = getMethodEnd(i);
+                    }
+                }
             }
-            String signature =  toSignature(line);
-            if(signature.equals("nextInt()I")){
-                continue;
-            }
-            if(!funSignatures.contains(signature)){
-                String method = getSurroundingMethodSignature(i);
-                errors.add(String.format("Undefined call to (%s) in method (%s)", signature, method));
-            }
+
         }
 
 
         return errors;
+    }
+
+    private int getMethodEnd(int line){
+        for(int i = line; i < asm.size(); i++){
+            if(asm.get(i).contains(".end method")){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private boolean isMethodDef(String line){
+        return line.contains(".method");
     }
 
     /**
