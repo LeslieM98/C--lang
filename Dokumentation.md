@@ -62,7 +62,7 @@ Funktionen unterstützen Rekursion.
 ### Besondere Funktionen
 - Die Sprache besitzt eine eingebaute Ausgabefunktion, die einen Wert auf der Kommandozeile ausgibt. Diese Funktion heißt `println()` und nimmt als Übergabeparameter ein Konstrukt, das zu einem Wert evaluiert werden kann. D.h. Es können z.B. boolsche Berechnungen durchgeführt werden, deren Ergebnisse als `0` oder als `1` auf der Konsole zu sehen sind. Alternativ können auch Literale oder Variablen/Konstanten und allgemein Ausdrücke ausgegeben werden.
 - Die Funktion `void main()` stellt eine Besonderheit dar. Wie in C ist sie der Einstiegspunkt des Programms.
-- Die Funtion `num get()` ist scannt stdin nach einem `num` wert ab und gibt diesen zurück.
+- Die Funktion `num get()` scannt stdin nach einem `num` Wert ab und gibt diesen zurück.
 
 
 # Aufgetretene Probleme
