@@ -782,6 +782,13 @@ public class CodeTest{
         actual = runCmm(input);
         assertEquals(expected, actual);
 
+        input = "void main(){num a;a = 1;loop (a < 20) {println(fib(a));a = a + 1;}} num fib(num n){if(n == 1){return 0;}if(n == 2){return 1;}return fib(n - 1) + fib(n - 2);}";
+        StringBuilder expect = new StringBuilder();
+        for(int i = 1; i < 20; i++){
+            expect.append(fib(i)).append(System.lineSeparator());
+        }
+        assertEquals(expect.toString(), runCmm(input));
+
         
     }
 
@@ -799,7 +806,9 @@ public class CodeTest{
 
 		input = "void main() {num a; num b; a = 2; b = 3; num c; c = a * b; println(c);}";
 		expected = "6" + System.lineSeparator();
-		assertEquals(expected, runCmm(input));
+        assertEquals(expected, runCmm(input));
+        
+
 	}
 
 	@Test
@@ -815,5 +824,15 @@ public class CodeTest{
         App a = new App();
         String[] arg = {"-j", "test.txt"};
         a.start(arg);
+    }
+
+    private int fib(int n){
+        if(n==1){
+            return 0;
+        }
+        if(n==2){
+            return 1;
+        }
+        return fib(n-1) + fib(n-2);
     }
 }

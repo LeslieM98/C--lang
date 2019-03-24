@@ -596,8 +596,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     @Override
     public List<String> visitNumber(NumberContext ctx) {
         List<String> asm = new ArrayList<>();
+        String numTxt = ctx.number.getText();
 
-        int value = Integer.parseInt(ctx.number.getText());
+        int value = Integer.parseInt(numTxt);
 
         asm.add("ldc " + value);
 
