@@ -28,7 +28,8 @@ Variablen stellen veränderbare Speicherbereiche dar, die der Programmierer nutz
 - Syntax: `num <Identifier> = <Wert>;`
 
 ## Standard Arithmetik
-Es werden die arithmetischen Operationen `+`, `-`, `*`, `/` für ganzzahlige Datentypen unterstützt. Für die Operation `/` bedeutet dies jedoch, dass keine Rundung vorgenommen wird. Teilt man `5/3` so erhält man nicht, wie vielleicht erwartet, das korrekt gerundete Ergebnis `2`, sondern stets das nach unten abgerundete Ergebnis und damit in diesem Beispiel `1`. Arithmetische Operationen folgen der gewohnten Operatorpräzedenz, die man aus der Mathematik kennt, sprich von Links nach Rechts und Punkt vor Strich. Natürlich verändert umklammerung der Operationen die Reihenfolge, dies funktioniert auch wie gewohnt.
+Es werden die arithmetischen Operationen `+`, `-`, `*`, `/` für ganzzahlige Datentypen unterstützt. Für die Operation `/` bedeutet dies jedoch, dass keine Rundung vorgenommen wird. Teilt man `5/3` so erhält man nicht, wie vielleicht erwartet, das korrekt gerundete Ergebnis `2`, sondern stets das nach unten abgerundete Ergebnis und damit in diesem Beispiel `1`. Arithmetische Operationen folgen der gewohnten Operatorpräzedenz, die man aus der Mathematik kennt, sprich von Links nach Rechts und Punkt vor Strich. Natürlich verändert umklammerung der Operationen die Reihenfolge, dies funktioniert auch wie gewohnt. 
+Operationen müssen leerzeichen behinhalten d.h. `(1-1)` ist nicht gültig, aber `(1 - 1)`.
 
 ## Boolsche Algebra  
 Der Wert `0` entspricht einem Wahrheitswert von Falsch wohingegen alles andere als Wahr aufgefasst wird. Es werden die meisten herkömmlichen Boolschen Operationen unterstützt. In folgender Präzedenzreihenfolge.
@@ -36,6 +37,7 @@ Der Wert `0` entspricht einem Wahrheitswert von Falsch wohingegen alles andere a
  - `!` : Negiert einen boolschen Ausdruck ((Alles != 0) -> 0, 0 -> 1)
  - `==`, `!=` : Prüfung auf Gleichheit und Ungleichheit (funktioniert für Wahrheitswerte und Numerische Werte)
  - `&&`, `||` : Boolsche AND- und OR-Verknüpfung.
+Boolsche operationen müssen keine leerzeichen enthalten d.h. `(0==0)` ist volkommen korrekte syntax, sowie `(0 == 0)`. Dies ist um sie besser von arithmetischen Operationen unterscheiden zu können.
 
 ## Branch-Statements (If-Else)
 Die Sprache C-- unterstützt die Formulierung von Code der nur unter vorherigen Bedingungen ausgeführt wird. Dazu wird ein If-Else-Konstrukt genutzt. Dabei ist es möglich, den Else-Zweig des Statements wegzulassen. Hierbei sind die Wahrheitswerte, die im Abschnitt *Boolsche Algebra* eingeführt wurden, für die `Bedingung` zu beachten.
@@ -54,10 +56,12 @@ Funktionen bestehen aus Kopf und Körper. Die Rückgabe eines Wertes erfolgt dur
 Funktionen können aufgerufen werden.
  - Syntax: `<Identifier>(<AusdruckListe>)`
 
+Funktionen unterstützen Rekursion.
+
 
 ### Besondere Funktionen
 - Die Sprache besitzt eine eingebaute Ausgabefunktion, die einen Wert auf der Kommandozeile ausgibt. Diese Funktion heißt `println()` und nimmt als Übergabeparameter ein Konstrukt, das zu einem Wert evaluiert werden kann. D.h. Es können z.B. boolsche Berechnungen durchgeführt werden, deren Ergebnisse als `0` oder als `1` auf der Konsole zu sehen sind. Alternativ können auch Literale oder Variablen/Konstanten und allgemein Ausdrücke ausgegeben werden.
-- Die Funktion `main()` stellt eine Besonderheit dar. Wie in C ist sie der Einstiegspunkt des Programms.
+- Die Funktion `void main()` stellt eine Besonderheit dar. Wie in C ist sie der Einstiegspunkt des Programms.
 
 
 # Aufgetretene Probleme
