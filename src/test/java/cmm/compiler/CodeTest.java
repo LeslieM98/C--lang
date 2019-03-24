@@ -3,6 +3,7 @@ package cmm.compiler;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -24,6 +25,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.junit.jupiter.api.*;
 
+import cmm.compiler.exception.AllreadyDefinedException;
 import cmm.compiler.generated.*;
 import cmm.compiler.utillity.*;
 import cmm.compiler.utillity.ScopeManager.*;
@@ -234,6 +236,15 @@ public class CodeTest{
         input = "void main(){const num a = 5;println(2 + 2 + 2 + a);}";
         expected = "11" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
+
+        input = "const num a = 5;void main(){println(2 + 2 + 2 + a);}";
+        expected = "11" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
+
+        input = "const num a = 5;void main(){const num a = 5;println(2 + 2 + 2 + a);}";
+        assertThrows(AllreadyDefinedException.class,
+         () -> runCmm("const num a = 5;void main(){const num a = 5;println(2 + 2 + 2 + a);}")
+        );
     
     }
 
