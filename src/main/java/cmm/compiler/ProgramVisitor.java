@@ -80,6 +80,17 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             asm.add("invokevirtual java/util/Scanner/nextInt()I");
             asm.add("ireturn");
             asm.add(".end method");
+
+            // println Method
+            asm.add(".method public println(I)V");
+            asm.add(".limit stack 2");
+            asm.add(".limit locals 2");
+            asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
+            asm.add("iload 1");
+            asm.add("invokevirtual java/io/PrintStream/println(I)V");
+            asm.add("return");
+            asm.add(".end method");
+
             allreadyAddedClassDef = true;
         }
 
@@ -368,15 +379,12 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         StringBuilder functionCall = new StringBuilder("invokevirtual ");
             
-        if(f.equals(SYSOUT)){
-            functionCall.append("java/io/PrintStream/println(I)V");
-            asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
-        } else {
-            functionCall
-                .append(programName + "/")
-                .append(f.toSignature());
-            asm.add("aload_0"); // push this ptr
-        }
+
+        functionCall
+            .append(programName + "/")
+            .append(f.toSignature());
+        asm.add("aload_0"); // push this ptr
+        
         
 
 
