@@ -33,6 +33,24 @@ import jasmin.ClassFile;
 
 public class CodeTest{
 
+    @BeforeEach
+    @AfterEach
+    void clean(){
+        Path cmm = Paths.get("TestAsm.cmm");
+        Path asm = Paths.get("TestAsm.j");
+
+        try {
+            Files.delete(cmm);
+        } catch (Exception e) {
+        }
+
+        try {
+            Files.delete(asm);
+        } catch (Exception e) {
+        }
+
+    }
+
     /**
      * Takes in jasmin assembly, assembles it, runs it and 
      * returns the output of System.out of the given code.
@@ -757,6 +775,13 @@ public class CodeTest{
         expected = String.format("%d%s%d%s%d%s%d%s", 1, ls, 3, ls, 2, ls, 4, ls);
         actual = runCmm(input);
         assertEquals(expected, actual);
+
+        // Recursive calls
+        input = "void main(){println(fac(3));}num fac(num n){if(n == 1){return 1;} else {return n * fac(n - 1);}}";
+        expected = "6" + System.lineSeparator();
+        actual = runCmm(input);
+        assertEquals(expected, actual);
+
         
     }
 

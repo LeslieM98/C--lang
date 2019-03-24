@@ -271,15 +271,24 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      * @param ctx A context.
      * @return The parentstatement of ctx or null if not existing.
      */
-    private StatementContext getParentStatement(RuleContext ctx){
+    private RuleContext getCallingContext(RuleContext ctx){
         RuleContext parent = ctx.parent;
+        String ptext = parent.getText();
+        String text = ctx.getText();
+
         if(parent instanceof ProgramContext){
             return null;
         }
-        if(parent instanceof StatementContext){
-            return (StatementContext) parent;
+        if(parent instanceof Assign_operationContext){
+            return parent;
         }
-        return getParentStatement(ctx);
+        if(parent instanceof StatementContext){
+            return null;
+        }
+        if(parent instanceof FunctionCallExpressionContext){
+            return parent;
+        }
+        return getCallingContext(ctx);
     }
 
     /**
@@ -288,17 +297,13 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      * @return true if functions returns a value, false otherwise.
      */
     private boolean hasReturn(Function_callContext ctx){
-        StatementContext stmnt = getParentStatement(ctx);
+        String name = ctx.getText();
+        RuleContext stmnt = getCallingContext(ctx);
         if(stmnt == null){
             return false;
         }
 
-        long numberOfVarDecs =  ctx.children
-            .stream()
-            .filter(x -> x instanceof Variable_declarationContext)
-            .count();
-
-        return numberOfVarDecs == 1;
+        return true;
     }
 
     /**
