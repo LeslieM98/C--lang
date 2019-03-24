@@ -37,6 +37,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         this.programName = programName;
         allreadyAddedClassDef = false;
         definedFunctions.add(SYSOUT);
+        definedFunctions.add(SYSIN);
     }
 
     @Override
@@ -64,6 +65,20 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             asm.add(String.format("invokespecial %s/<init>()V", programName));
             asm.add(String.format("invokevirtual %s/%s",programName ,PROGRAM_ENTRY.toSignature()));
             asm.add("return");
+            asm.add(".end method");
+
+            // get Method
+            asm.add(".method public get()I");
+            asm.add(".limit stack 3");
+            asm.add(".limit locals 2");
+            asm.add("new java/util/Scanner");
+            asm.add("dup");
+            asm.add("getstatic java/lang/System/in Ljava/io/InputStream;");
+            asm.add("invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V");
+            asm.add("astore_1");
+            asm.add("aload_1");
+            asm.add("invokevirtual java/util/Scanner/nextInt()I");
+            asm.add("ireturn");
             asm.add(".end method");
             allreadyAddedClassDef = true;
         }
@@ -328,7 +343,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     /**
      * Predefined function for printing to stdout.
      */
-    private static final Function SYSOUT = new Function(NativeTypes.VOID, "println", Arrays.asList(new Pair<>("n", NativeTypes.NUM)));
+    public static final Function SYSOUT = new Function(NativeTypes.VOID, "println", Arrays.asList(new Pair<>("n", NativeTypes.NUM)));
+    public static final Function SYSIN  = new Function(NativeTypes.NUM, "get", new ArrayList<>());
     /**
      * If a function call was found this function determines what function was called based on the context. 
      * It differs between returning/non-returning functions and the parametercount if any

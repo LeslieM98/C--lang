@@ -40,12 +40,16 @@ public class FunctionCallValidator {
      */
     public List<String> validate(){
         List<String> errors = new ArrayList<>();
+        
         for(int i = 0; i < asm.size(); i++){
             String line = asm.get(i);
             if(!isMethodCall(line)){
                 continue;
             }
             String signature =  toSignature(line);
+            if(signature.equals("nextInt()I")){
+                continue;
+            }
             if(!funSignatures.contains(signature)){
                 String method = getSurroundingMethodSignature(i);
                 errors.add(String.format("Undefined call to (%s) in method (%s)", signature, method));
