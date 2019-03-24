@@ -641,12 +641,12 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	return asm;
     }
 
-    @Override
-    public List<String> visitBranch(BranchContext ctx) {
+    private List<String> generateIfElse(BranchContext ctx){
         List<String> asm = new ArrayList<>();
         long branchNum = branchCounter++;
         asm.addAll(visit(ctx.condition)); // evaluate the condition and put it onto the stack
         asm.add("ifne ifTrue" + branchNum + System.lineSeparator());
+
         if(ctx.onFalse != null) {
         	asm.addAll(visit(ctx.onFalse));
         }
@@ -655,6 +655,25 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.addAll(visit(ctx.onTrue));
         asm.add("endIf" + branchNum + ":" + System.lineSeparator());
         return asm;
+    }
+
+    private List<String> generateIfOnly(BranchContext ctx){
+        List<String> asm = new ArrayList<>();
+        long branchNum = branchCounter++;
+        asm.addAll(visit(ctx.condition));
+        asm.add("ifne endIf" + branchNum);
+        asm.addAll(visit(ctx.onTrue));
+        asm.add("endIf" + branchNum + ":");
+        return asm;
+    }
+
+    @Override
+    public List<String> visitBranch(BranchContext ctx) {
+        if(ctx.onFalse != null){    // if has else branch
+            return generateIfElse(ctx);
+        } else {
+            return generateIfOnly(ctx);
+        }
     }
     
     @Override
@@ -669,6 +688,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	asm.add("EndLoop" + loopNum + ":" + System.lineSeparator());
     	return asm;
     }
+
 
     
     
