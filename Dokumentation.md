@@ -1,5 +1,17 @@
 
 # C-- Dokumentation
+#
+
+## Konzeption der Entwicklung
+Zu Beginn der Entwicklung wurden die vorgegebenen Anforderungen gesammelt. Daraufhin wurde sich darauf geeinigt wie die einzelnen Schlüsselwörter der Sprache heißen sollen um eine Grammatik definieren zu können. In diesem Zuge wurde auch gleichzeitig ein privates Repository auf Github angelegt, bei dem es 2 Projekte gab. Die Projekte die beschrieben die vorgegebenen Anforderungen (Required Features) und die optionalen Anforderungen, die wir selbst noch an unsere Sprache gestellt haben. Diese Projekte sollten bei der späteren Entwicklung genutzt werden um den Fortschritt an den einzelnen Sprach-Features zu dokumentieren. Dabei gab es für jeden Task noch die Unterpunkte *Implemented* und *Tested*.
+
+## Vorgehen während der Entwicklung
+Zu Beginn der Entwicklung wurde die gesamte Grammatik definiert und die Features auf diese Grammatik hin zugeschnitten. Dies funktionierte auch bis zu einem gewissen Punkt, an dem wir uns dann allerdings dazu entschieden, Features zu implementieren, für die eine Anpassung der Grammatik notwendig war. Im Zuge dessen entschieden wir uns aus Gründen der Testbarkeit auch von unserem ursprünglichen Plan, der Sprache einen double-ähnlichen Datentyp zu geben, abzuweichen und stellten die Sprache auf einen einfacheren Datentyp um. Dies war jedoch ein kleinerer Aufwand als angenommen, da die Generierung des Lexers und Parsers durch **Antlr** sehr viel einfacher und reibungsloser von statten ging als angenommen. 
+
+So wurden alle vorgegebenen Anforderungen und auch einige der optionalen Anforderungen umgesetzt. Zum Ende des Projektes wurden aus Zeitgründen einige der optionalen Features jedoch nicht mehr realisiert. Nach und nach füllte sich so die Sprache mit Features und mit jedem neu realisierten Feature konnten neue Tests geschrieben werden. Zusätzlich zu diesen Tests schrieben wir auch kleinere Programme in der eigenen Sprache um den Programmieralltag in der Sprache abschätzen zu können und weitere Notwendigkeiten zu erkennen. Dabei sind besonders die mehreren Compilerfehler die erkannt werden zu nennen aber auch die Standardausgabemethode println() die in der Sprache von Hause aus mitgeliefert wird.
+
+
+# Beschreibung der Sprache
 ## Grundsätzliches
 Die C-- Sprache beachtet keinen Leerraum. Für den Compiler ist es unerheblich, ob eine bestimmte Einrückung eingehalten wird, oder ob nach dem Abschluss eines Statements durch `;` ein Linefeed-Zeichen gesetzt wird. Natürlich hilft dies jedoch bei der Strukturierung des Programms und wird von den Entwicklern der Sprache wärmstens empfohlen.
 Die Sprache setzt sich aus Statements zusammen, die in der Regel durch `;` abgeschlossen werden (vgl. C).
