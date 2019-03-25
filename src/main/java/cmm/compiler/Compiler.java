@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.tree.*;
 
 import java.util.*;
 
+import cmm.compiler.exception.CompileRuntimeException;
 import cmm.compiler.generated.*;
 import cmm.compiler.utillity.FunctionCallValidator;
 import cmm.compiler.utillity.ScopeManager.Type;
@@ -41,8 +42,14 @@ public class Compiler{
         ParseTree pt = createParser(infile).program();
         ProgramVisitor v = new ProgramVisitor(programname);
         
+        try {
+            List<String> compiled = v.visit(pt);
+        } catch (CompileRuntimeException e){
+            System.err.println(e.getPreparedMessage());
+            System.exit(1);
+        }
         
-        final List<String> asm = v.visit(pt);
+        final List<String> asm = new ArrayList<>();
 
         //inserting public fields
         v.getGlobalVariables().stream()
