@@ -603,6 +603,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         List<String> asm = new ArrayList<>();
         
         Identifier id = scopes.get(ctx.getText());
+        if(id == null){
+            throw new UndefinedSymbolException(ctx.variableName, "Undefined identifier");
+        }
 
         if(id.getType() == Type.CONSTANT){
             asm.add("ldc " + id.getValue());
