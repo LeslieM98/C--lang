@@ -617,17 +617,16 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             throw new UndefinedSymbolException(ctx.variableName, "Undefined identifier");
         }
 
-        if(id.getScope() == Scope.GLOBAL){
-            asm.add("aload_0");
-            asm.add("getfield " + programName + "/" + id.getValue() + " I");
+        if(id.getType() == Type.CONSTANT){
+            asm.add("ldc " + id.getValue());
         } else {
-            if(id.getType() == Type.CONSTANT){
-                asm.add("ldc " + id.getValue());
+            if(id.getScope() == Scope.GLOBAL){
+                asm.add("aload_0");
+                asm.add("getfield " + programName + "/" + id.getValue() + " I");
             } else {
                 asm.add("iload " + id.getValue());
             }
-        }
-        
+        }       
 
         return asm;
     }
