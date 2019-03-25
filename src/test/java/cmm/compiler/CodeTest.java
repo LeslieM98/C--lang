@@ -3,6 +3,7 @@ package cmm.compiler;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -24,12 +25,31 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.junit.jupiter.api.*;
 
+import cmm.compiler.exception.AllreadyDefinedException;
 import cmm.compiler.generated.*;
 import cmm.compiler.utillity.*;
 import cmm.compiler.utillity.ScopeManager.*;
 import jasmin.ClassFile;
 
 public class CodeTest{
+
+    @BeforeEach
+    @AfterEach
+    void clean(){
+        Path cmm = Paths.get("TestAsm.cmm");
+        Path asm = Paths.get("TestAsm.j");
+
+        try {
+            Files.delete(cmm);
+        } catch (Exception e) {
+        }
+
+        try {
+            Files.delete(asm);
+        } catch (Exception e) {
+        }
+
+    }
 
     /**
      * Takes in jasmin assembly, assembles it, runs it and 
@@ -225,39 +245,25 @@ public class CodeTest{
 
     @Test
     public void testConstants(){
+        String input, expected;
 
-        // // Test if a single constant does not throw an error.
-        // String inputString = "const num test = 20;";
-        // ParseTree tree = createParser(inputString).program();
-        // ProgramVisitor v = new ProgramVisitor();
-        // try{
-        //     v.visit(tree);
-        // } catch (Exception e){
-        //     Assertions.fail("Exception was thrown" + e.getMessage());
-        // }
+        input = "void main(){const num a = 5;println(a);}";
+        expected = "5" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
 
-        // // Test if 2 different constants with the same identifier throw an error.
-        // boolean exThrown = false;
-        // inputString = "const num test = 20; const num test = 21;";
-        // tree = createParser(inputString).program();
-        // v = new ProgramVisitor();
-        // try{
-        //     v.visit(tree);
-        // } catch (Exception e){
-        //     exThrown = true;
-        // }
-        // Assertions.assertTrue(exThrown);
+        input = "void main(){const num a = 5;println(2 + 2 + 2 + a);}";
+        expected = "11" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
 
-        // // Test if 2 different constants with different identifiers do not throw an error.
-        // inputString = "const num test = 20; const num test1 = 21;";
-        // tree = createParser(inputString).program();
-        // v = new ProgramVisitor();
-        // try{
-        //     v.visit(tree);
-        // } catch (Exception e){
-        //     Assertions.fail("Exception was thrown" + e.getMessage());
-        // }
+        input = "const num a = 5;void main(){println(2 + 2 + 2 + a);}";
+        expected = "11" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
 
+        input = "const num a = 5;void main(){const num a = 5;println(2 + 2 + 2 + a);}";
+        assertThrows(AllreadyDefinedException.class,
+         () -> runCmm("const num a = 5;void main(){const num a = 5;println(2 + 2 + 2 + a);}")
+        );
+    
     }
 
     @Test
@@ -726,7 +732,6 @@ public class CodeTest{
 
     }
 
-    @Disabled
     @Test
     public void testFunctionCalls() {
         final String ls = System.lineSeparator();
@@ -760,7 +765,7 @@ public class CodeTest{
         assertEquals(expected, actual);
 
         // Overloading + functions with different names
-        input = String.format("%s%s%s%s",
+        input = String.format("%s%s%s%s%s",
             "void main(){a();b();a(1);b(2);}",
             "void a(){println(1);}",
             "void a(num a){println(2);}",
@@ -770,6 +775,20 @@ public class CodeTest{
         expected = String.format("%d%s%d%s%d%s%d%s", 1, ls, 3, ls, 2, ls, 4, ls);
         actual = runCmm(input);
         assertEquals(expected, actual);
+
+        // Recursive calls
+        input = "void main(){println(fac(3));}num fac(num n){if(n == 1){return 1;} else {return n * fac(n - 1);}}";
+        expected = "6" + System.lineSeparator();
+        actual = runCmm(input);
+        assertEquals(expected, actual);
+
+        input = "void main(){num a;a = 1;loop (a < 20) {println(fib(a));a = a + 1;}} num fib(num n){if(n == 1){return 0;}if(n == 2){return 1;}return fib(n - 1) + fib(n - 2);}";
+        StringBuilder expect = new StringBuilder();
+        for(int i = 1; i < 20; i++){
+            expect.append(fib(i)).append(System.lineSeparator());
+        }
+        assertEquals(expect.toString(), runCmm(input));
+
         
     }
 
@@ -787,7 +806,9 @@ public class CodeTest{
 
 		input = "void main() {num a; num b; a = 2; b = 3; num c; c = a * b; println(c);}";
 		expected = "6" + System.lineSeparator();
-		assertEquals(expected, runCmm(input));
+        assertEquals(expected, runCmm(input));
+        
+
 	}
 
 	@Test
@@ -815,5 +836,15 @@ public class CodeTest{
         App a = new App();
         String[] arg = {"-j", "test.txt"};
         a.start(arg);
+    }
+
+    private int fib(int n){
+        if(n==1){
+            return 0;
+        }
+        if(n==2){
+            return 1;
+        }
+        return fib(n-1) + fib(n-2);
     }
 }

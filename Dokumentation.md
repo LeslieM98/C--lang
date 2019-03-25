@@ -13,7 +13,7 @@ Ein Programm besteht aus mehreren Scopes. Diese wären `Global`, `Lokal`, `Tempo
 ## Typen
 Die Sprache besitzt nur einen Datentyp (`num`) und zwei Rückgabetypen (`num`, `void`).
     
-- `num` beschreibt einen ganzzahligen Wert wie er aus der Sprache C bekannt ist.
+- `num` beschreibt einen ganzzahligen Wert wie er aus der Sprache C bekannt ist. (`int32_t`)
 - `void` ist nur gültig als Rückgabetyp und beschreibt, dass die Funktion nichts zurück gibt.
 
 ## Literale  
@@ -21,23 +21,24 @@ Literale sind jegliche konstanten Zahlen die im Code auftauchen. Beispielsweise 
 
 
 ## Konstanten
-Konstanten sind Werte, die während dem Compileprozess zwischengespeichert werden. Konstanten sind scopeabhängig. Es können nur Konstanten genutzt werden die im gleichen oder in einem höheren Scope definiert wurden. Konstanten werden im späteren Kontext einfach nur substituiert. Konstanten haben keinen Typ, sie speichern nur den String der ihnen zugewiesen wird. Einer Konstanten muss im selben Statement der Wert zugewiesen werden.
+Konstanten sind Werte, die während dem Compileprozess zwischengespeichert werden. Konstanten sind scopeabhängig. Es können nur Konstanten genutzt werden die im gleichen oder in einem höheren Scope definiert wurden. Konstanten werden im späteren Kontext einfach nur substituiert. Konstanten haben keinen Typ, sie speichern nur den String der ihnen zugewiesen wird. Einer Konstanten muss im selben Statement der Wert zugewiesen werden. Da Konstanten aus designtechnischen Gründen erst zur zwischencodegeneration substituiert werden, dürfen nur Literale zugewiesen werden, aber keine Expressions.
  - Syntax: `const num <Identifier> = <Wert>;`
 
 ## Variablen
-Variablen stellen veränderbare Speicherbereiche dar, die der Programmierer nutzen kann, um darin Literale zu speichern und diese in weiteren Rechnungen zu benutzen und im Gegensatz zu Konstanten auch überschreiben kann. Die Sichtbarkeit einer Variablen ist von dem Scope abhängig, in dem sie definiert wurde.
+Variablen stellen veränderbare Speicherbereiche dar, die der Programmierer nutzen kann, um darin Literale zu speichern und diese in weiteren Rechnungen zu benutzen und im Gegensatz zu Konstanten auch überschreiben kann. Die Sichtbarkeit einer Variablen ist von dem Scope abhängig, in dem sie definiert wurde. Wie bei Konstanten können nur Variablen genutzt werden, die im selben Scope oder in einem höheren deklariert wurden.
 - Syntax: `num <Identifier> = <Wert>;`
 
 ## Standard Arithmetik
-Es werden die arithmetischen Operationen `+`, `-`, `*`, `/` für ganzzahlige Datentypen unterstützt. Für die Operation `/` bedeutet dies jedoch, dass keine Rundung vorgenommen wird. Teilt man `5/3` so erhält man nicht, wie vielleicht erwartet, das korrekt gerundete Ergebnis `2`, sondern stets das nach unten abgerundete Ergebnis und damit in diesem Beispiel `1`.
-Bei dem Rechnen mit negativen Zahlen kann es schnell etwas komplizierter werden, da es hier nötig ist negative Literale eigens zu klammern. Aus der Rechnung `5-3` muss dann `5+(-3)` werden.
+Es werden die arithmetischen Operationen `+`, `-`, `*`, `/` für ganzzahlige Datentypen unterstützt. Für die Operation `/` bedeutet dies jedoch, dass keine Rundung vorgenommen wird. Teilt man `5/3` so erhält man nicht, wie vielleicht erwartet, das korrekt gerundete Ergebnis `2`, sondern stets das nach unten abgerundete Ergebnis und damit in diesem Beispiel `1`. Arithmetische Operationen folgen der gewohnten Operatorpräzedenz, die man aus der Mathematik kennt, sprich von Links nach Rechts und Punkt vor Strich. Natürlich verändert umklammerung der Operationen die Reihenfolge, dies funktioniert auch wie gewohnt. 
+Operationen müssen leerzeichen behinhalten d.h. `(1-1)` ist nicht gültig, aber `(1 - 1)`.
 
 ## Boolsche Algebra  
 Der Wert `0` entspricht einem Wahrheitswert von Falsch wohingegen alles andere als Wahr aufgefasst wird. Es werden die meisten herkömmlichen Boolschen Operationen unterstützt. In folgender Präzedenzreihenfolge.
  - `<`, `>`, `<=`, `>=` : Vergleichsoperatoren zweier Werte die in Wahr oder Falsch resultieren.
- - `!` : Negiert einen boolschen ausdruck
+ - `!` : Negiert einen boolschen Ausdruck ((Alles != 0) -> 0, 0 -> 1)
  - `==`, `!=` : Prüfung auf Gleichheit und Ungleichheit (funktioniert für Wahrheitswerte und Numerische Werte)
  - `&&`, `||` : Boolsche AND- und OR-Verknüpfung.
+Boolsche operationen müssen keine leerzeichen enthalten d.h. `(0==0)` ist volkommen korrekte syntax, sowie `(0 == 0)`. Dies ist um sie besser von arithmetischen Operationen unterscheiden zu können.
 
 ## Branch-Statements (If-Else)
 Die Sprache C-- unterstützt die Formulierung von Code der nur unter vorherigen Bedingungen ausgeführt wird. Dazu wird ein If-Else-Konstrukt genutzt. Dabei ist es möglich, den Else-Zweig des Statements wegzulassen. Hierbei sind die Wahrheitswerte, die im Abschnitt *Boolsche Algebra* eingeführt wurden, für die `Bedingung` zu beachten.
@@ -56,10 +57,13 @@ Funktionen bestehen aus Kopf und Körper. Die Rückgabe eines Wertes erfolgt dur
 Funktionen können aufgerufen werden.
  - Syntax: `<Identifier>(<AusdruckListe>)`
 
+Funktionen unterstützen Rekursion.
+
 
 ### Besondere Funktionen
 - Die Sprache besitzt eine eingebaute Ausgabefunktion, die einen Wert auf der Kommandozeile ausgibt. Diese Funktion heißt `println()` und nimmt als Übergabeparameter ein Konstrukt, das zu einem Wert evaluiert werden kann. D.h. Es können z.B. boolsche Berechnungen durchgeführt werden, deren Ergebnisse als `0` oder als `1` auf der Konsole zu sehen sind. Alternativ können auch Literale oder Variablen/Konstanten und allgemein Ausdrücke ausgegeben werden.
-- Die Funktion `main()` stellt eine Besonderheit dar. Wie in C ist sie der Einstiegspunkt des Programms.
+- Die Funktion `void main()` stellt eine Besonderheit dar. Wie in C ist sie der Einstiegspunkt des Programms.
+- Die Funktion `num get()` scannt stdin nach einem `num` Wert ab und gibt diesen zurück.
 
 
 # Aufgetretene Probleme
@@ -77,5 +81,8 @@ Es ist bei mehrfach Deklarationen jedoch nur möglich auf die Variable des inner
 Ein konkretes Beispiel hierzu wäre: Wie kann mein Compiler erkennen dass `num add(num a, num b)` und `num add(num a, num b, num c)` Grund auf verschiedene Funktionen sind?
 Unser Ansatz ist es eine Klasse einzuführen, die Metadaten der Funktion speichert. In diesem Fall den Identifier, den Returntyp und die Parameter und deren Typen. Diese Metadaten beschreiben die Signatur der Methode und diese Signatur muss innerhalb eines Programms eindeutig sein.
 
-Der ProgrammVisitor hat nun eine Liste von definierten Funktionen, die anfangs leer ist. Sobald eine deklarierte Funktion gefunden wird, wird sie dieser Liste hinzugefügt, sofern nicht bereits eine Funktion mit der gleichen Signatur in dieser Liste vorhanden ist.
+Der ProgramVisitor hat nun eine Liste von definierten Funktionen, die anfangs leer ist. Sobald eine deklarierte Funktion gefunden wird, wird sie dieser Liste hinzugefügt, sofern nicht bereits eine Funktion mit der gleichen Signatur in dieser Liste vorhanden ist.
 
+### Wie kann gewährleistet werden, dass Funktionen die später definiert sind, trotzdem korrekt aufgerufen werden können von Funktionen, die oberhalb definiert sind?
+Ein naiver ansatz wäre es, wie von C bekannt Funktionsprototypen einzuführen. Dies würde jedoch die Sprache relativ verbose gestalten und es sieht nicht so schön aus. Deshalb führen wir einen Validationsschritt ein, der über den generierten zwischencode läuft (siehe `FunctionCallValidator.java`).  
+Der ProgramVisitor registriert jegliche defnierte Funktion und übersetzt diese. Nun wird diese Liste an registrierten Funktionen direkt an den Validator übergeben und dieser geht Befehl für Befehl durch den Zwischencode und überprüft, ob eine aufgerufene Funktion in oben genannter Liste gefunden wird. Wenn nicht wird ein Error zwischengespeichert. Dieser Validationsschritt erlabut es dem Compiler auch mehrere inkorrekte Funktionsaufrufe zu erkennen und somit mehrere Fehler auszugeben.

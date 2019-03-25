@@ -78,7 +78,7 @@ statement
     ;
 
 returnstatement
-    : 'return' returnValue=expression
+    : 'return' (returnValue=expression)?
     ;
 
 

@@ -37,6 +37,7 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         this.programName = programName;
         allreadyAddedClassDef = false;
         definedFunctions.add(SYSOUT);
+        definedFunctions.add(SYSIN);
     }
 
     @Override
@@ -65,6 +66,31 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             asm.add(String.format("invokevirtual %s/%s",programName ,PROGRAM_ENTRY.toSignature()));
             asm.add("return");
             asm.add(".end method");
+
+            // get Method
+            asm.add(".method public get()I");
+            asm.add(".limit stack 3");
+            asm.add(".limit locals 2");
+            asm.add("new java/util/Scanner");
+            asm.add("dup");
+            asm.add("getstatic java/lang/System/in Ljava/io/InputStream;");
+            asm.add("invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V");
+            asm.add("astore_1");
+            asm.add("aload_1");
+            asm.add("invokevirtual java/util/Scanner/nextInt()I");
+            asm.add("ireturn");
+            asm.add(".end method");
+
+            // println Method
+            asm.add(".method public println(I)V");
+            asm.add(".limit stack 2");
+            asm.add(".limit locals 2");
+            asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
+            asm.add("iload 1");
+            asm.add("invokevirtual java/io/PrintStream/println(I)V");
+            asm.add("return");
+            asm.add(".end method");
+
             allreadyAddedClassDef = true;
         }
 
@@ -136,11 +162,14 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         String name = ctx.dec.variableName.getText();
         String value = ctx.val.getText();
 
-        boolean successfull = true;
+        try{
+            Integer.parseInt(value);
+        } catch (NumberFormatException e){
+            throw new InvalidExpressionException(tk, "Cannot assign expression to constant, it has to be an integer literal");
+        }
 
         // Try to add in global scope
-        scopes.putConstant(name, value);
-
+        boolean successfull = scopes.putConstant(name, value);
 
         if(!successfull){
             throw new AllreadyDefinedException(tk, "Redefinition of constant");
@@ -268,15 +297,24 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      * @param ctx A context.
      * @return The parentstatement of ctx or null if not existing.
      */
-    private StatementContext getParentStatement(RuleContext ctx){
+    private RuleContext getCallingContext(RuleContext ctx){
         RuleContext parent = ctx.parent;
+        String ptext = parent.getText();
+        String text = ctx.getText();
+
         if(parent instanceof ProgramContext){
             return null;
         }
-        if(parent instanceof StatementContext){
-            return (StatementContext) parent;
+        if(parent instanceof Assign_operationContext){
+            return parent;
         }
-        return getParentStatement(ctx);
+        if(parent instanceof StatementContext){
+            return null;
+        }
+        if(parent instanceof FunctionCallExpressionContext){
+            return parent;
+        }
+        return getCallingContext(ctx);
     }
 
     /**
@@ -285,17 +323,13 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      * @return true if functions returns a value, false otherwise.
      */
     private boolean hasReturn(Function_callContext ctx){
-        StatementContext stmnt = getParentStatement(ctx);
+        String name = ctx.getText();
+        RuleContext stmnt = getCallingContext(ctx);
         if(stmnt == null){
             return false;
         }
 
-        long numberOfVarDecs =  ctx.children
-            .stream()
-            .filter(x -> x instanceof Variable_declarationContext)
-            .count();
-
-        return numberOfVarDecs == 1;
+        return true;
     }
 
     /**
@@ -320,7 +354,8 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     /**
      * Predefined function for printing to stdout.
      */
-    private static final Function SYSOUT = new Function(NativeTypes.VOID, "println", Arrays.asList(new Pair<>("n", NativeTypes.NUM)));
+    public static final Function SYSOUT = new Function(NativeTypes.VOID, "println", Arrays.asList(new Pair<>("n", NativeTypes.NUM)));
+    public static final Function SYSIN  = new Function(NativeTypes.NUM, "get", new ArrayList<>());
     /**
      * If a function call was found this function determines what function was called based on the context. 
      * It differs between returning/non-returning functions and the parametercount if any
@@ -344,15 +379,12 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
         StringBuilder functionCall = new StringBuilder("invokevirtual ");
             
-        if(f.equals(SYSOUT)){
-            functionCall.append("java/io/PrintStream/println(I)V");
-            asm.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
-        } else {
-            functionCall
-                .append(programName + "/")
-                .append(f.toSignature());
-            asm.add("aload_0"); // push this ptr
-        }
+
+        functionCall
+            .append(programName + "/")
+            .append(f.toSignature());
+        asm.add("aload_0"); // push this ptr
+        
         
 
 
@@ -588,8 +620,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     @Override
     public List<String> visitNumber(NumberContext ctx) {
         List<String> asm = new ArrayList<>();
+        String numTxt = ctx.number.getText();
 
-        int value = Integer.parseInt(ctx.number.getText());
+        int value = Integer.parseInt(numTxt);
 
         asm.add("ldc " + value);
 
@@ -633,12 +666,12 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	return asm;
     }
 
-    @Override
-    public List<String> visitBranch(BranchContext ctx) {
+    private List<String> generateIfElse(BranchContext ctx){
         List<String> asm = new ArrayList<>();
         long branchNum = branchCounter++;
         asm.addAll(visit(ctx.condition)); // evaluate the condition and put it onto the stack
         asm.add("ifne ifTrue" + branchNum + System.lineSeparator());
+
         if(ctx.onFalse != null) {
         	asm.addAll(visit(ctx.onFalse));
         }
@@ -647,6 +680,25 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         asm.addAll(visit(ctx.onTrue));
         asm.add("endIf" + branchNum + ":" + System.lineSeparator());
         return asm;
+    }
+
+    private List<String> generateIfOnly(BranchContext ctx){
+        List<String> asm = new ArrayList<>();
+        long branchNum = branchCounter++;
+        asm.addAll(visit(ctx.condition));
+        asm.add("ifeq endIf" + branchNum);
+        asm.addAll(visit(ctx.onTrue));
+        asm.add("endIf" + branchNum + ":");
+        return asm;
+    }
+
+    @Override
+    public List<String> visitBranch(BranchContext ctx) {
+        if(ctx.onFalse != null){    // if has else branch
+            return generateIfElse(ctx);
+        } else {
+            return generateIfOnly(ctx);
+        }
     }
     
     @Override
@@ -660,6 +712,18 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	asm.add("goto IfLoop" + loopNum + System.lineSeparator());
     	asm.add("EndLoop" + loopNum + ":" + System.lineSeparator());
     	return asm;
+    }
+
+    @Override
+    public List<String> visitReturnstatement(ReturnstatementContext ctx) {
+        List<String> asm = new ArrayList<>();
+        if(ctx.returnValue == null){
+            asm.add("return");
+        } else {
+            asm.addAll(visit(ctx.returnValue));
+            asm.add("ireturn");
+        }
+        return asm;
     }
 
     

@@ -326,7 +326,7 @@ public class ScopeManager {
         if(get(name) != null) return false;
         if(currentConstants == null) return false;
 
-        return currentConstants.putIfAbsent(name, value) != null;
+        return currentConstants.putIfAbsent(name, value) == null;
     }
 
     /**
