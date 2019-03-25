@@ -12,6 +12,7 @@ import java.util.*;
 
 import cmm.compiler.generated.*;
 import cmm.compiler.utillity.FunctionCallValidator;
+import cmm.compiler.utillity.ScopeManager.Type;
 
 public class Compiler{
 
@@ -41,7 +42,12 @@ public class Compiler{
         ProgramVisitor v = new ProgramVisitor(programname);
         
         
-        List<String> asm = v.visit(pt);
+        final List<String> asm = v.visit(pt);
+
+        //inserting public fields
+        v.getGlobalVariables().stream()
+            .filter(x -> x.getType() == Type.VARIABLE)
+            .forEach(x -> asm.add(2, ".field public " + x.getValue() + " I"));
 
         // Validating
         FunctionCallValidator fcv = new FunctionCallValidator(

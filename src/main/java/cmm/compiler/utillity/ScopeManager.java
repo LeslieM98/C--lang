@@ -235,7 +235,7 @@ public class ScopeManager {
      */
     private boolean putGlobVar(String name){
         if(get(name) != null) return false;
-        return globalVariables.putIfAbsent(name, name) != null;
+        return globalVariables.putIfAbsent(name, name) == null;
     }
 
     /**
@@ -375,6 +375,16 @@ public class ScopeManager {
         return locals;
     }
 
+    public List<Identifier> getGlobalVars(){
+        final List<Identifier> globs = new ArrayList<>();
+
+        globalVariables.keySet().stream()
+            .map(x -> new Identifier(Scope.GLOBAL, Type.VARIABLE, x, globalVariables.get(x)))
+            .forEach(globs::add);
+
+        return globs;
+    }
+
 
 
     /**
@@ -446,7 +456,7 @@ public class ScopeManager {
         public String getValue() {
             return value;
         }
-    
+
     
         @Override
         public String toString() {
@@ -472,7 +482,6 @@ public class ScopeManager {
             }
         return false;
         }
-    
     
     } 
 }

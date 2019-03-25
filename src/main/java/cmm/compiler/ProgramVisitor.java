@@ -14,6 +14,7 @@ import cmm.compiler.generated.*;
 import cmm.compiler.exception.*;
 import cmm.compiler.utillity.*;
 import cmm.compiler.utillity.ScopeManager.Identifier;
+import cmm.compiler.utillity.ScopeManager.Scope;
 import cmm.compiler.utillity.ScopeManager.Type;
 
 
@@ -180,11 +181,13 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     
     @Override
     public List<String> visitVardec(VardecContext ctx) {
-    	String name = ctx.dec.variableName.getText();
-    	if(!scopes.putVar(name)) {
-    		throw new AllreadyDefinedException(ctx.dec.variableName, "Redefinition of constant");
-    	}
-    	return new ArrayList<>();
+        ArrayList<String> asm = new ArrayList<>();
+        String name = ctx.dec.variableName.getText();
+        if(!scopes.putVar(name)) {
+            throw new AllreadyDefinedException(ctx.dec.variableName, "Redefinition of constant");
+        }
+
+    	return asm;
     }
     
     @Override
@@ -194,8 +197,15 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	if (var.getType() == Type.CONSTANT) {
     		throw new AllreadyDefinedException(ctx.variableName, "Redefinition of constant");
     	}
-    	asm.addAll(visit(ctx.expr));
-    	asm.add("istore " + var.getValue());
+        List<String> visited = visit(ctx.expr);
+        if (var.getScope() == Scope.GLOBAL){
+            asm.add("aload_0");
+            asm.addAll(visited);
+            asm.add("putfield " + programName + "/" + var.getValue() + " I");
+        } else {
+            asm.addAll(visited);
+            asm.add("istore " + var.getValue());
+        }
     	return asm;
     }
     
@@ -607,14 +617,17 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
             throw new UndefinedSymbolException(ctx.variableName, "Undefined identifier");
         }
 
-        if(id.getType() == Type.CONSTANT){
-            asm.add("ldc " + id.getValue());
+        if(id.getScope() == Scope.GLOBAL){
+            asm.add("aload_0");
+            asm.add("getfield " + programName + "/" + id.getValue() + " I");
         } else {
-        	asm.add("iload " + id.getValue());
+            if(id.getType() == Type.CONSTANT){
+                asm.add("ldc " + id.getValue());
+            } else {
+                asm.add("iload " + id.getValue());
+            }
         }
-
-
-
+        
 
         return asm;
     }
@@ -736,5 +749,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     public List<Function> getDefinedFunctions() {
         return definedFunctions;
+    }
+
+    public List<ScopeManager.Identifier> getGlobalVariables(){
+        return scopes.getGlobalVars();
     }
 }
