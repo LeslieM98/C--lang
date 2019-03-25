@@ -193,7 +193,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     @Override
     public List<String> visitAssign_operation(Assign_operationContext ctx) {
     	List<String> asm = new ArrayList<>();
-    	Identifier var = scopes.get(ctx.variableName.getText());
+        Identifier var = scopes.get(ctx.variableName.getText());
+        if(var == null){
+            throw new UndefinedSymbolException(ctx.variableName, "Unknown Identifier");
+        }
     	if (var.getType() == Type.CONSTANT) {
     		throw new AllreadyDefinedException(ctx.variableName, "Redefinition of constant");
     	}
