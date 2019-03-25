@@ -807,6 +807,10 @@ public class CodeTest{
 		input = "void main() {num a; num b; a = 2; b = 3; num c; c = a * b; println(c);}";
 		expected = "6" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
+
+        input = "num a;void main(){a = 0;a();b();}void a(){a = 5;}void b(){println(a);}";
+        expected = "5" + System.lineSeparator();
+        assertEquals(expected, runCmm(input));
         
 
 	}

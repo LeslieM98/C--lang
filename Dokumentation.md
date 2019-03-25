@@ -21,12 +21,12 @@ Literale sind jegliche konstanten Zahlen die im Code auftauchen. Beispielsweise 
 
 
 ## Konstanten
-Konstanten sind Werte, die während dem Compileprozess zwischengespeichert werden. Konstanten sind scopeabhängig. Es können nur Konstanten genutzt werden die im gleichen oder in einem höheren Scope definiert wurden. Konstanten werden im späteren Kontext einfach nur substituiert. Konstanten haben keinen Typ, sie speichern nur den String der ihnen zugewiesen wird. Einer Konstanten muss im selben Statement der Wert zugewiesen werden. Da Konstanten aus designtechnischen Gründen erst zur zwischencodegeneration substituiert werden, dürfen nur Literale zugewiesen werden, aber keine Expressions.
+Konstanten sind Werte, die während dem Compileprozess zwischengespeichert werden. Konstanten sind scopeabhängig. Es können nur Konstanten genutzt werden die im gleichen oder in einem höheren Scope definiert wurden. Konstanten werden im späteren Kontext einfach nur substituiert. Konstanten haben keinen Typ, sie speichern nur den String der ihnen zugewiesen wird. Einer Konstanten muss im selben Statement der Wert zugewiesen werden. Da Konstanten aus designtechnischen Gründen erst zur zwischencodegeneration substituiert werden, dürfen nur Literale zugewiesen werden, aber keine Expressions. Konstanten können im globalen scope definiert werden.
  - Syntax: `const num <Identifier> = <Wert>;`
 
 ## Variablen
-Variablen stellen veränderbare Speicherbereiche dar, die der Programmierer nutzen kann, um darin Literale zu speichern und diese in weiteren Rechnungen zu benutzen und im Gegensatz zu Konstanten auch überschreiben kann. Die Sichtbarkeit einer Variablen ist von dem Scope abhängig, in dem sie definiert wurde. Wie bei Konstanten können nur Variablen genutzt werden, die im selben Scope oder in einem höheren deklariert wurden.
-- Syntax: `num <Identifier> = <Wert>;`
+Variablen stellen veränderbare Speicherbereiche dar, die der Programmierer nutzen kann, um darin Literale zu speichern und diese in weiteren Rechnungen zu benutzen und im Gegensatz zu Konstanten auch überschreiben kann. Die Sichtbarkeit einer Variablen ist von dem Scope abhängig, in dem sie definiert wurde. Wie bei Konstanten können nur Variablen genutzt werden, die im selben Scope oder in einem höheren deklariert wurden. Variablen müssen erst deklariert werden bevor sie genutzt werden. Variablen können im globalen scope deklariert werden und sind somit von jeder funktion veränderbar und zugreifbar.
+- Syntax: `num <Identifier>; <Identifier> = <Wert>`
 
 ## Standard Arithmetik
 Es werden die arithmetischen Operationen `+`, `-`, `*`, `/` für ganzzahlige Datentypen unterstützt. Für die Operation `/` bedeutet dies jedoch, dass keine Rundung vorgenommen wird. Teilt man `5/3` so erhält man nicht, wie vielleicht erwartet, das korrekt gerundete Ergebnis `2`, sondern stets das nach unten abgerundete Ergebnis und damit in diesem Beispiel `1`. Arithmetische Operationen folgen der gewohnten Operatorpräzedenz, die man aus der Mathematik kennt, sprich von Links nach Rechts und Punkt vor Strich. Natürlich verändert umklammerung der Operationen die Reihenfolge, dies funktioniert auch wie gewohnt. 
