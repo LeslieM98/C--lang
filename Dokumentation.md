@@ -37,7 +37,7 @@ Konstanten sind Werte, die während dem Compileprozess zwischengespeichert werde
  - Syntax: `const num <Identifier> = <Wert>;`
 
 ## Variablen
-Variablen stellen veränderbare Speicherbereiche dar, die der Programmierer nutzen kann, um darin Literale zu speichern und diese in weiteren Rechnungen zu benutzen und im Gegensatz zu Konstanten auch überschreiben kann. Die Sichtbarkeit einer Variablen ist von dem Scope abhängig, in dem sie definiert wurde. Wie bei Konstanten können nur Variablen genutzt werden, die im selben Scope oder in einem höheren deklariert wurden. Variablen müssen erst deklariert werden bevor sie genutzt werden. Variablen können im globalen scope deklariert werden und sind somit von jeder funktion veränderbar und zugreifbar.
+Variablen stellen veränderbare Speicherbereiche dar, die der Programmierer nutzen kann, um darin Literale zu speichern und diese in weiteren Rechnungen zu benutzen und im Gegensatz zu Konstanten auch überschreiben kann. Die Sichtbarkeit einer Variablen ist von dem Scope abhängig, in dem sie definiert wurde. Wie bei Konstanten können nur Variablen genutzt werden, die im selben Scope oder in einem höheren deklariert wurden. Variablen müssen erst deklariert werden bevor sie genutzt werden. Variablen können im globalen scope deklariert werden und sind somit von jeder funktion veränderbar und zugreifbar. Variablen werden nicht default initialisiert und somit ist das Programm nicht lauffähig, wenn eine uninitialisierte Variable verwendet wird(Dies wird zur laufzeit bestimmt).
 - Syntax: `num <Identifier>; <Identifier> = <Wert>`
 
 ## Standard Arithmetik
@@ -118,3 +118,63 @@ Erleichtert das generieren von Java `.class` Dateien, welche dann von der JVM in
 ## Github
 Ermöglicht es sehr einfach kollaborativ Code zu entwickeln und gleichzeitig ein Task-Management zu betreiben.  
 [Webseite](https://github.com/)
+
+# Beispielprogramme
+
+## Fakultät Reukrsiv
+### Code
+    void main(){
+        println(fac(4));
+    }
+
+    num fac(num n){
+        if(n == 1){
+	        return 1;
+        }
+        return n * fac(n - 1);
+    }
+### Ausgabe
+    24
+
+## Fibonacci iterativ
+### Code
+    void main() {
+
+        fib(10);
+
+    }
+
+
+    void fib (num n){
+        num c;
+        num first;
+        num second;
+        num next;
+
+        first = 0;
+        second = 1;
+        next = 0;
+        c = 0;
+        loop(c < n){
+            if (c <= 1) {
+                next = c;
+            } else {
+                next = first + second;
+                first = second;
+                second = next;
+            }
+            println(next);
+            c = c + 1;
+        }
+    }
+### Ausgabe
+    0
+    1
+    1
+    2
+    3
+    5
+    8
+    13
+    21
+    34
