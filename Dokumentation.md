@@ -98,3 +98,23 @@ Der ProgramVisitor hat nun eine Liste von definierten Funktionen, die anfangs le
 ### Wie kann gewährleistet werden, dass Funktionen die später definiert sind, trotzdem korrekt aufgerufen werden können von Funktionen, die oberhalb definiert sind?
 Ein naiver ansatz wäre es, wie von C bekannt Funktionsprototypen einzuführen. Dies würde jedoch die Sprache relativ verbose gestalten und es sieht nicht so schön aus. Deshalb führen wir einen Validationsschritt ein, der über den generierten zwischencode läuft (siehe `FunctionCallValidator.java`).  
 Der ProgramVisitor registriert jegliche defnierte Funktion und übersetzt diese. Nun wird diese Liste an registrierten Funktionen direkt an den Validator übergeben und dieser geht Befehl für Befehl durch den Zwischencode und überprüft, ob eine aufgerufene Funktion in oben genannter Liste gefunden wird. Wenn nicht wird ein Error zwischengespeichert. Dieser Validationsschritt erlabut es dem Compiler auch mehrere inkorrekte Funktionsaufrufe zu erkennen und somit mehrere Fehler auszugeben.
+
+
+# Verwendete Technologien
+
+## Java 8+
+Java streams erleichtern manche operationen auf Collections Datenstrukturen erheblich. Diese sind erst seit Java 8 enthalten.  
+[Webseite](https://www.java.com)
+
+## ANTLR4
+Mächtiges Framework zur Compiler-Frontend generierung. Nimmt Grammatikdateien an und generiert alles bis hin zum AST-visitor. Dieser muss dann implementiert werden um auf bestimmte Kontextknoten im AST zu reagieren und korrekten Code zu generieren.  
+[Webseite](https://www.antlr.org/)
+
+## Jasmin
+Java Assembler Interface.  
+Erleichtert das generieren von Java `.class` Dateien, welche dann von der JVM interpretiert und ausgeführt werden.  
+[Webseite](http://jasmin.sourceforge.net/)
+
+## Github
+Ermöglicht es sehr einfach kollaborativ Code zu entwickeln und gleichzeitig ein Task-Management zu betreiben.  
+[Webseite](https://github.com/)
