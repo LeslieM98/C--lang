@@ -41,15 +41,16 @@ public class Compiler{
     public void compile(){
         ParseTree pt = createParser(infile).program();
         ProgramVisitor v = new ProgramVisitor(programname);
+
+        final List<String> asm = new ArrayList<>();
         
         try {
-            List<String> compiled = v.visit(pt);
+            asm.addAll(v.visit(pt));
         } catch (CompileRuntimeException e){
             System.err.println(e.getPreparedMessage());
-            System.exit(1);
+            return;
         }
         
-        final List<String> asm = new ArrayList<>();
 
         //inserting public fields
         v.getGlobalVariables().stream()

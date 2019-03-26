@@ -259,10 +259,7 @@ public class CodeTest{
         expected = "11" + System.lineSeparator();
         assertEquals(expected, runCmm(input));
 
-        input = "const num a = 5;void main(){const num a = 5;println(2 + 2 + 2 + a);}";
-        assertThrows(AllreadyDefinedException.class,
-         () -> runCmm("const num a = 5;void main(){const num a = 5;println(2 + 2 + 2 + a);}")
-        );
+        assertNull(runCmm("const num a = 5;void main(){const num a = 5;println(2 + 2 + 2 + a);}"));
     
     }
 
