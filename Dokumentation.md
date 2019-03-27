@@ -119,6 +119,14 @@ Erleichtert das generieren von Java `.class` Dateien, welche dann von der JVM in
 Ermöglicht es sehr einfach kollaborativ Code zu entwickeln und gleichzeitig ein Task-Management zu betreiben.  
 [Webseite](https://github.com/)
 
+## JUnit5
+Einfach zu nutzendes Testframework, um code zu Testen
+[Webseite](https://junit.org/junit5/)
+
+## Maven
+Java Build- und Dependencytool zum compilen des Compilers
+[Webseite](https://maven.apache.org/)
+
 # Beispielprogramme
 
 ## Fakultät Reukrsiv

@@ -127,7 +127,7 @@ public class CodeTest{
 
             Class<?> cls = Class.forName(className, false, classLoader);
             Method m = cls.getMethod("main", String[].class);
-            m.invoke(null, new String[1]);
+            m.invoke(null, (Object) null);
 
         } catch (Exception e){
             return null;
