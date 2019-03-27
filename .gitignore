@@ -1,0 +1,35 @@
+# Testfile for grammars
+test.cmm
+
+# Maven generated files
+.classpath
+.project
+bin/
+target/
+dependency-reduced-pom.xml
+
+# Antlr generated files
+src/main/antlr4/cmm/compiler/.antlr
+.antlr/
+
+# IDE specific files
+#   VSCode
+.vscode/
+#   Eclipse
+.settings/
+
+# Generated Jasmin files
+*.j
+
+# Test Cmm code
+*.txt
+
+# compiled code
+*.class
+*.jar
+
+# TestMain
+src/main/java/cmm/compiler/TestApp.java
+
+# Testfile for sourcecode
+*.cmm

@@ -1,0 +1,34 @@
+Problem: Expression Definition
+	- Was ist alles eine Expression
+	- Wie unterscheiden wir Boolsche Expressions
+--> 	- Eine Expression ist alles das was einen Wert liefert
+	- Man unterscheidet sie nicht 
+
+
+Problem: Fehler erkennung
+	- Exception System aufbauen das Exceptions wirft wenn fehler auftritt
+	Problem: nur ein Fehler pro compile durchgang.
+
+Problem: Scopes richtig darstellen
+	- Scopetable einführen Scopename -> Identifier
+	  Wenn enthalten, Identifier ist im momentanen scope, 
+	  sonst nicht.
+-->		- Eine Scopemanagement Klasse schreiben die herausfindet ob eine gecallte var gültig ist oder nicht
+		  Untestützt lokale, globale und temporäre Scopes
+	- Was sind temporäre scopes?
+--> 	- Beispielsweise Scopes die nur innerhalb ifs und schleifen existieren.
+
+Problem: Representation von Funktionen
+	- Datenklasse erstellen die nur wichtigste metadaten zu einer funktion enthält
+	- Erkennen der anzahl von funktionsparametern schwierig
+-->		- Mit offset durch token iterieren um parameter zu filtern
+
+
+Problem: Boolsche algebra, wahrheitswerte.
+	- Wann ist ein wert true und wann false?
+-->		0 = false, !false = true;
+	- richtige jumpreihen folge bei befeheln die nicht von JVM vorgegeben sind
+	- da wir intern mit doubles arbeiten wird es schwierig komplexe boolsche expressions 
+	  darzustellen, da die meisten mit ints arbeiten.
+--> dcmpg funktioniert wie compareTo nur mit doubles. danach zero comps verwenden
+	
