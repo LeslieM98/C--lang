@@ -3,8 +3,6 @@ package cmm.compiler;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,10 +20,8 @@ import java.io.PrintStream;
 import java.net.*;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
 import org.junit.jupiter.api.*;
 
-import cmm.compiler.exception.AllreadyDefinedException;
 import cmm.compiler.generated.*;
 import cmm.compiler.utillity.*;
 import cmm.compiler.utillity.ScopeManager.*;
@@ -446,7 +442,7 @@ public class CodeTest{
     
     @Test
     public void testEquality(){
-        String input, expected, actual;
+        String input, expected;
 
         // !=
         input = "void main(){println(1 != 2);}";

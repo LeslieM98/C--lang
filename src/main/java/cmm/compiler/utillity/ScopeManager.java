@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
  * @author Leslie Marxen
  */
 
-
-// TODO: needs testing
 public class ScopeManager {
     private Map<String, String> globalConstants;
     private Map<String, String> globalVariables;

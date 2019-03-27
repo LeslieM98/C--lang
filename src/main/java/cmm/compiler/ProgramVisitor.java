@@ -2,9 +2,7 @@ package cmm.compiler;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -249,9 +247,6 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      * 
      * @throws AllreadyDefinedException If the function was allready defined.
      */
-    // TODO: Check for correct return
-    // TODO: locals and stacksize
-    // TODO: insert parameters correctly
     @Override
     public List<String> visitFunction_definition(Function_definitionContext ctx) {
         List<String> asm = new ArrayList<>();
@@ -312,8 +307,6 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      */
     private RuleContext getCallingContext(RuleContext ctx){
         RuleContext parent = ctx.parent;
-        String ptext = parent.getText();
-        String text = ctx.getText();
 
         if(parent instanceof ProgramContext){
             return null;
@@ -336,7 +329,6 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      * @return true if functions returns a value, false otherwise.
      */
     private boolean hasReturn(Function_callContext ctx){
-        String name = ctx.getText();
         RuleContext stmnt = getCallingContext(ctx);
         if(stmnt == null){
             return false;
@@ -440,7 +432,6 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
      * {@code !=}: push 1 if both are different, 0 if both are equal. 
      * 
      */
-    // TODO: Optimize asm
     @Override
     public List<String> visitEquality(EqualityContext ctx) {
         // Load left side of operation to stack
