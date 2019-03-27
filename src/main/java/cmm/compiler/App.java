@@ -45,6 +45,11 @@ public class App{
 
 
 
+    /**
+     * Sets the compilers state to fit the inputted parameters
+     * @param args commandline arguments
+     * @return true if the arguments are valid, false if otherwise.
+     */
     boolean evaluateArguments(String[] args){
         if(args.length > 2 || args.length == 0){
             System.out.println(HELP_MSG);
