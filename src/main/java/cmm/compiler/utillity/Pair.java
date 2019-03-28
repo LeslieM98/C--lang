@@ -4,8 +4,9 @@ package cmm.compiler.utillity;
  * Used to pair two different objects together.
  * @param <T> Type of the left object.
  * @param <U> Type of the right object.
+ * 
+ * @author Leslie Marxen
  */
-
 public class Pair<T, U>{
     private final T left;
     private final U right;
