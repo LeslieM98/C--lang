@@ -27,6 +27,10 @@ import cmm.compiler.utillity.*;
 import cmm.compiler.utillity.ScopeManager.*;
 import jasmin.ClassFile;
 
+/**
+ * @author Lukas Raubuch
+ * @author Leslie Marxen
+ */
 public class CodeTest{
 
     @BeforeEach

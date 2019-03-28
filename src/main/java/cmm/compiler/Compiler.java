@@ -15,6 +15,11 @@ import cmm.compiler.generated.*;
 import cmm.compiler.utillity.FunctionCallValidator;
 import cmm.compiler.utillity.ScopeManager.Type;
 
+/**
+ * @author Leslie Marxen
+ * @author Lukas Raubuch
+ *
+ */
 public class Compiler{
 
     
