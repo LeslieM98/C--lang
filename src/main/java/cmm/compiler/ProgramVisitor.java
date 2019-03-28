@@ -15,7 +15,10 @@ import cmm.compiler.utillity.ScopeManager.Identifier;
 import cmm.compiler.utillity.ScopeManager.Scope;
 import cmm.compiler.utillity.ScopeManager.Type;
 
-
+/**
+ * @author Lukas Raubuch
+ * @author Leslie Marxen
+ */
 public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
     private final String programName;
