@@ -104,11 +104,11 @@ Der ProgramVisitor registriert jegliche defnierte Funktion und übersetzt diese.
 # Verwendete Technologien
 
 ## Java 8+
-Java Streams erleichtern manche operationen auf Collections Datenstrukturen erheblich. Diese sind erst seit Java 8 enthalten.  
+Java Streams erleichtern manche Operationen auf Collection Datenstrukturen erheblich. Diese sind erst seit Java 8 enthalten.  
 [Webseite](https://www.java.com)
 
 ## ANTLR4
-Mächtiges Framework zur Compiler-Frontend generierung. Nimmt Grammatikdateien an und generiert alles, bis hin zum AST-visitor. Dieser muss dann implementiert werden um auf bestimmte Kontextknoten im AST zu reagieren und korrekten Code zu generieren.  
+Mächtiges Framework zur Compiler-Frontend Generierung. Nimmt Grammatikdateien als Input und generiert alles bis hin zum AST-visitor. Dieser muss dann implementiert werden um auf bestimmte Kontextknoten im AST zu reagieren und korrekten Code zu generieren.
 [Webseite](https://www.antlr.org/)
 
 ## Jasmin
@@ -121,11 +121,11 @@ Ermöglicht es sehr einfach kollaborativ Code zu entwickeln und gleichzeitig Tas
 [Webseite](https://github.com/)
 
 ## JUnit5
-Einfach zu nutzendes Testframework, um code zu Testen.
+Einfach zu nutzendes Test-Framework, um Code zu testen
 [Webseite](https://junit.org/junit5/)
 
 ## Maven
-Java Build- und Dependencytool zum compilen des Compilers.
+Java Build- und Dependency-Tool zum Bauen des Compilers
 [Webseite](https://maven.apache.org/)
 
 # Beispielprogramme
