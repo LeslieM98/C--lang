@@ -130,6 +130,11 @@ public class ScopeManager {
         return true;
     }
 
+    /**
+     * Switches the internal state to the local context of a given function.
+     * @param f The metadata about the function.
+     * @return true if successfully switched, false if otherwise
+     */
     public boolean switchContext(Function f){
         if(f == null) {
             switchToGlobalContext();
@@ -373,6 +378,10 @@ public class ScopeManager {
         return locals;
     }
 
+    /**
+     * Collects all global Variables and returns them.
+     * @return List containing of Identifiers of Global Variables
+     */
     public List<Identifier> getGlobalVars(){
         final List<Identifier> globs = new ArrayList<>();
 
@@ -397,6 +406,10 @@ public class ScopeManager {
         CONSTANT;
     }
 
+    /**
+     * Used as reference to see in what scope the variable was defined. 
+     * Depending on the scope the variable needs to be accessed in a different manner
+     */
     public static enum Scope{
         GLOBAL,
         LOCAL,
@@ -417,6 +430,13 @@ public class ScopeManager {
         private final String name;
         private final String value;
     
+        /**
+         * Constructor for the Identifier Class.
+         * @param scope The scope it was defined in.
+         * @param type The type of the identifier.
+         * @param name The called name of the identifier
+         * @param value Access informations.
+         */
         private Identifier(Scope scope, Type type, String name, String value){
             if(scope == null || type == null || name == null || value == null){
                 throw new IllegalStateException("Cannot assign nullvalue");
@@ -455,7 +475,10 @@ public class ScopeManager {
             return value;
         }
 
-    
+        /**
+         * Returs a String representation of the object. {@code SCOPE:TYPE:NAME}
+         * @return a string representation of the object.
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder()
@@ -466,6 +489,10 @@ public class ScopeManager {
             return sb.toString();
         }
     
+        /**
+         * Compares 2 Identifiers for equality. 
+         * Equality is determined by the fact that all fields are the exact same value
+         */
         @Override
         public boolean equals(Object obj) {
             if (obj != null && getClass() == obj.getClass()) {

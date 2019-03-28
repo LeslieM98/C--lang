@@ -39,6 +39,11 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         definedFunctions.add(SYSIN);
     }
 
+    /**
+     * Starts the code synthesis. Traverses the AST of the input code and generates context based Assembly.
+     * @param tree The AST
+     * @return A list containing the compiled assembly one instruction per element
+     */
     @Override
     public List<String> visit(ParseTree tree) {
         List<String> asm = new ArrayList<>();
@@ -97,6 +102,11 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
+    /**
+     * Transforms a string into an enum type
+     * @param in the string either {@code void} or {@code num}
+     * @return enum representation of the string
+     */
     private NativeTypes toNativeTypes(String in){
         switch(in){
             case "void":
@@ -177,6 +187,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return null;
     }
     
+    /**
+     * If a variable is declared it is registered in the corresponding scopemanager.
+     * @throws AllreadyDefinedException if the identifier was already used.
+     */
     @Override
     public List<String> visitVardec(VardecContext ctx) {
         ArrayList<String> asm = new ArrayList<>();
@@ -188,6 +202,12 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	return asm;
     }
     
+    /**
+     * Assigns a value to a variable. 
+     * {@code a = 12}
+     * @throws UndefinedSymbolException if the lvalue identifier was not registered before
+     * @throws AllreadyDefinedException if the lvalue identifier was registered as constant
+     */
     @Override
     public List<String> visitAssign_operation(Assign_operationContext ctx) {
     	List<String> asm = new ArrayList<>();
@@ -602,6 +622,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
 
 
 
+    /**
+     * Loads the fould identifier within an expression onto the opstack.
+     */
     @Override
     public List<String> visitVariable(VariableContext ctx) {
         List<String> asm = new ArrayList<>();
@@ -626,6 +649,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     }
 
 
+    /**
+     * Loads a constant literal number onto the opstack.
+     */
     @Override
     public List<String> visitNumber(NumberContext ctx) {
         List<String> asm = new ArrayList<>();
@@ -639,6 +665,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
+    /**
+     * Evaluates the {@code +} operation in an expression.
+     * First visits the lefthand side and pushes it onto the opstack and then the righthand side.
+     */
     @Override
     public List<String> visitPlus(PlusContext ctx) {
     	List<String> asm = new ArrayList<>();
@@ -648,6 +678,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	return asm;
     }
 
+    /**
+     * Evaluates the {@code -} operation in an expression.
+     * First evaluates the lefthand side then the righthand side, finally pushes both onto the stack.
+     */
     @Override
     public List<String> visitMinus(MinusContext ctx) {
     	List<String> asm = new ArrayList<>();
@@ -656,7 +690,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	asm.add("isub"); // subtract right from left
     	return asm;
     }
-    
+    /**
+     * Evaluates the {@code /} operation in an expression.
+     * First evaluates the lefthand side then the righthand side, finally pushes both onto the stack.
+     */
     @Override
     public List<String> visitDivision(DivisionContext ctx) {
     	List<String> asm = new ArrayList<>();
@@ -666,6 +703,10 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	return asm;
     }
     
+    /**
+     * Evaluates the {@code -} operation in an expression.
+     * First evaluates the lefthand side then the righthand side, finally pushes both onto the stack.
+     */
     @Override
     public List<String> visitMultiplication(MultiplicationContext ctx) {
     	List<String> asm = new ArrayList<>();
@@ -675,6 +716,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	return asm;
     }
 
+    /**
+     * Generates the code as soon as an if statement combinated with else shows up.
+     */
     private List<String> generateIfElse(BranchContext ctx){
         List<String> asm = new ArrayList<>();
         long branchNum = branchCounter++;
@@ -691,6 +735,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
+    /**
+     * Generates the code as soon as a single if statement occurs.
+     */
     private List<String> generateIfOnly(BranchContext ctx){
         List<String> asm = new ArrayList<>();
         long branchNum = branchCounter++;
@@ -701,6 +748,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return asm;
     }
 
+    /**
+     * Determines if an if statement has an elsebranch or not and generates the correct code.
+     */
     @Override
     public List<String> visitBranch(BranchContext ctx) {
         if(ctx.onFalse != null){    // if has else branch
@@ -710,6 +760,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         }
     }
     
+    /**
+     * Evaluates the condition and body of a while loop. Loops then over the body until condition is false.
+     */
     @Override
     public List<String> visitLoop(LoopContext ctx) {
     	List<String> asm = new ArrayList<>();
@@ -722,7 +775,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
     	asm.add("EndLoop" + loopNum + ":" + System.lineSeparator());
     	return asm;
     }
-
+    /**
+     * depending if the return statement has an expression the fitting code is generated.
+     */
     @Override
     public List<String> visitReturnstatement(ReturnstatementContext ctx) {
         List<String> asm = new ArrayList<>();
@@ -744,6 +799,9 @@ public class ProgramVisitor extends CmmBaseVisitor<List<String>>{
         return definedFunctions;
     }
 
+    /**
+     * @return all global variables defined in this unit
+     */
     public List<ScopeManager.Identifier> getGlobalVariables(){
         return scopes.getGlobalVars();
     }

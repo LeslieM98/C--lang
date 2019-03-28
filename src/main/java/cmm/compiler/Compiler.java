@@ -22,22 +22,40 @@ public class Compiler{
     private String programname;
     private Path infile;
 
+    /**
+     * Constructor for the Compiler class.
+     * @param infile Which file to compile.
+     * @param generateJasmin Output prints out Jasmin code instead of a compiled classfile
+     */
     public Compiler(Path infile, boolean generateJasmin){
         this.infile = infile; 
         programname = resolveProgramName(infile);
         this.generateJasmin = generateJasmin;
     }
 
+    /**
+     * Returns the filename of the given file
+     * @param inFile A C-- file
+     * @return The used programname
+     */
     public static String resolveProgramName(Path inFile){
         String file = inFile.getFileName().toString();
         return removeFilenameExtension(file);
     }
     
+    /**
+     * Removes the fileextension from a file
+     * @param file The input file
+     * @return The path without the fileextension
+     */
     private static String removeFilenameExtension(String file) {
     	int pos = file.lastIndexOf('.');
     	return file.substring(0, pos != -1 ? pos : file.length());
     }
 
+    /**
+     * Actually compiles the program and outputs it as a File.
+     */
     public void compile(){
         ParseTree pt = createParser(infile).program();
         ProgramVisitor v = new ProgramVisitor(programname);
@@ -76,6 +94,11 @@ public class Compiler{
         }
     }
 
+    /**
+     * Writes Jasmin asembly into a file.
+     * @param asm The compiled sourcecode.
+     * @return true if successfull, false if otherwise
+     */
     private boolean writeJasmin(List<String> asm){
         Path out = Paths.get(programname + ".j");
         try{
@@ -87,6 +110,11 @@ public class Compiler{
         return true;
     }
 
+    /**
+     * Assembles the copmpiled jasmin file into a .class file
+     * @param asm The compiled Jasmin assembly code
+     * @return true if successfull, false if otherwise
+     */
     private boolean writeClass(List<String> asm){
         ClassFile cf = new ClassFile();
         String joined = String.join(System.lineSeparator(), asm);
@@ -121,10 +149,5 @@ public class Compiler{
             return null;
         }
     }
-
-    /**
-     * Validates the code and throws corresponding exceptions if anything is not working correctly.
-     */
-
 
 }

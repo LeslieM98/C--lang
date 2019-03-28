@@ -73,6 +73,11 @@ public class FunctionCallValidator {
         return -1;
     }
 
+    /**
+     * Determines wether a method is defined in this line of assembly code
+     * @param line the given line
+     * @return true if a method is defined, false otherwise
+     */
     private boolean isMethodDef(String line){
         return line.contains(".method");
     }

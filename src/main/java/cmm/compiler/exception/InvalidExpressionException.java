@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.Token;
 
 public class InvalidExpressionException extends CompileRuntimeException{
 
+    private static final long serialVersionUID = 11111111111111L;
 
 	/**
      * Constructor for AllreadyDefinedException.
